@@ -1,0 +1,38 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Tema utama aplikasi -->
+    <style name="Theme.BORJU_KP" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <!-- Warna dasar -->
+        <item name="colorPrimary">@color/Primary</item>
+        <item name="colorSecondary">@color/Secondary</item>
+        <item name="android:statusBarColor">@color/PrimaryDark</item>
+        <item name="android:navigationBarColor">@color/PrimaryDark</item>
+
+        <!-- 🌈 Pengaturan teks default -->
+        <item name="android:textColor">@color/TextPrimary</item>
+        <item name="android:fontFamily">@font/poppins_reguler</item> <!-- contoh font -->
+        <item name="android:textSize">14sp</item>
+
+        <!-- Untuk Button -->
+        <item name="android:buttonStyle">@style/Widget.Borju.Button</item>
+
+        <!-- Untuk TextView -->
+        <item name="android:textViewStyle">@style/Widget.Borju.TextView</item>
+    </style>
+
+    <!-- Style khusus untuk Button -->
+    <style name="Widget.Borju.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/Surface</item>
+        <item name="android:backgroundTint">@color/Primary</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
+    </style>
+
+    <!-- Style khusus untuk TextView -->
+    <style name="Widget.Borju.TextView" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/TextPrimary</item>
+        <item name="android:fontFamily">@font/poppins_reguler</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+</resources>
