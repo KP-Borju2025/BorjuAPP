@@ -22,5 +22,7 @@
     <color name="TextSecondary">#757575</color> <!-- Abu sedang -->
     <color name="Divider">#E0E0E0</color> <!-- Garis pemisah halus -->
 
+    <!-- Warna untuk Toolbar -->
+    <color name="borju_orange_primary">@color/Secondary</color>
 
 </resources>

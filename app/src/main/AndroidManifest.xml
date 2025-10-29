@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
     <application
         android:allowBackup="true"
@@ -18,27 +19,44 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BORJU_KP">
-        <activity
-            android:name=".ResetPasswordActivity"
-            android:exported="false" />
-        <activity
-            android:name=".customer.DashboardCostumer"
-            android:exported="false" />
+
+        <!-- Activity Admin -->
         <activity
             android:name=".admin.DashboardAdmin"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".admin.ManajemenMenuActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".admin.FormTambahMenu"
+            android:exported="false" />
+        <activity
+            android:name=".admin.FormEditMenu" 
+            android:exported="false" />
+        <activity
+            android:name=".admin.ManajemenPengeluaranActivity"
+            android:exported="false" />
+
+        <!-- Activity Customer -->
+        <activity
+            android:name=".customer.DashboardCostumer"
+            android:exported="false" />
+
+        <!-- Activity Auth & Main -->
+        <activity
+            android:name=".auth.ResetPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -46,6 +64,14 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+            
+        <!-- Activity yang belum digunakan tapi sudah ada di file lama -->
+        <activity android:name=".admin.PengeluaranActivity" android:exported="false" />
+        <activity android:name=".admin.RiwayatPesananActivity" android:exported="false" />
+        <activity android:name=".admin.ManajemenUserActivity" android.exported="false" />
+        <activity android:name=".admin.LaporanActivity" android:exported="false" />
+        <activity android:name=".admin.KasirActivity" android:exported="false" />
+
     </application>
 
 </manifest>

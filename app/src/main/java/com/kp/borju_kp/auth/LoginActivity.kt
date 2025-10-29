@@ -1,4 +1,4 @@
-package com.kp.borju_kp
+package com.kp.borju_kp.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.kp.borju_kp.R
+import com.kp.borju_kp.admin.DashboardAdmin
+import com.kp.borju_kp.customer.DashboardCostumer
 
 class LoginActivity : AppCompatActivity() {
 
@@ -51,12 +54,12 @@ class LoginActivity : AppCompatActivity() {
                                         when (role) {
                                             "Admin" -> {
                                                 Toast.makeText(this, "Login sebagai Admin", Toast.LENGTH_SHORT).show()
-                                                startActivity(Intent(this, com.kp.borju_kp.admin.DashboardAdmin::class.java))
+                                                startActivity(Intent(this, DashboardAdmin::class.java))
                                                 finish()
                                             }
                                             "Customer" -> {
                                                 Toast.makeText(this, "Login sebagai Customer", Toast.LENGTH_SHORT).show()
-                                                startActivity(Intent(this, com.kp.borju_kp.customer.DashboardCostumer::class.java))
+                                                startActivity(Intent(this, DashboardCostumer::class.java))
                                                 finish()
                                             }
                                             else -> {

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Opsi Cetak Laporan Pengeluaran"
+        android:textSize="20sp"
+        android:fontFamily="@font/poppins_bold"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rentang Waktu" />
+
+    <RadioGroup
+        android:id="@+id/rg_rentang_waktu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:id="@+id/rb_semua_waktu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Semua Waktu" />
+        <RadioButton
+            android:id="@+id/rb_pilih_tanggal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pilih Rentang Tanggal" />
+    </RadioGroup>
+    
+    <!-- Container untuk Date Picker, awalnya disembunyikan -->
+    <LinearLayout
+        android:id="@+id/layout_date_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="horizontal">
+        <Button android:id="@+id/btn_tgl_mulai" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:text="Mulai"/>
+        <Button android:id="@+id/btn_tgl_selesai" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:text="Selesai"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kategori" 
+        android:layout_marginTop="16dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Filter berdasarkan Kategori">
+
+        <AutoCompleteTextView
+            android:id="@+id/actv_kategori_cetak"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

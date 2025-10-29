@@ -35,4 +35,17 @@
         <item name="android:fontFamily">@font/poppins_reguler</item>
         <item name="android:textSize">12sp</item>
     </style>
+
+    <!-- Style untuk Judul Toolbar -->
+    <style name="TextAppearance.App.Title.ExtraBold" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:fontFamily">@font/poppins_extrabold</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Style untuk Sudut Tumpul pada ImageView -->
+    <style name="ShapeAppearanceOverlay.App.CornerRound" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
 </resources>

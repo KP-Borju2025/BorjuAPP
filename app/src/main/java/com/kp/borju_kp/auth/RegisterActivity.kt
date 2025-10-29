@@ -1,4 +1,4 @@
-package com.kp.borju_kp
+package com.kp.borju_kp.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.kp.borju_kp.R
 
 class RegisterActivity : AppCompatActivity() {
 
