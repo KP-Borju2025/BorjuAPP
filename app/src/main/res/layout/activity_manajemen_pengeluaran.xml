@@ -28,10 +28,10 @@
             android:id="@+id/tab_layout_kategori_pengeluaran"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabIndicatorColor="@color/white"
+            app:tabIndicatorColor="@color/Primary"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="#B3FFFFFF" />
+            app:tabSelectedTextColor="@color/Primary"
+            app:tabTextColor="@color/Primary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

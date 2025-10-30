@@ -31,15 +31,17 @@ class PengeluaranAdapter(private var pengeluaranList: List<Pengeluaran>) : Recyc
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nama: TextView = itemView.findViewById(R.id.tv_nama_pengeluaran)
+
+        private val kategori: TextView = itemView.findViewById(R.id.tv_kategori_pengeluaran)
+
         private val tanggal: TextView = itemView.findViewById(R.id.tv_tanggal_pengeluaran)
         private val jumlah: TextView = itemView.findViewById(R.id.tv_jumlah_pengeluaran)
 
         fun bind(pengeluaran: Pengeluaran) {
             nama.text = pengeluaran.namaPengeluaran
-            
+            kategori.text = pengeluaran.kategori
             val formatter = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale("id", "ID"))
             tanggal.text = pengeluaran.tanggal?.let { formatter.format(it) } ?: "-"
-            
             jumlah.text = "- Rp ${String.format("%,.0f", pengeluaran.jumlah)}"
         }
     }

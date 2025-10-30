@@ -31,11 +31,26 @@
             android:name=".admin.FormTambahMenu"
             android:exported="false" />
         <activity
-            android:name=".admin.FormEditMenu" 
+            android:name=".admin.FormEditMenu"
             android:exported="false" />
         <activity
             android:name=".admin.ManajemenPengeluaranActivity"
             android:exported="false" />
+        <activity
+            android:name=".admin.PengeluaranActivity"
+            android:exported="false" />
+        <activity
+            android:name=".admin.RiwayatPesananActivity"
+            android:exported="false" />
+        <activity
+            android:name=".admin.ManajemenUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".admin.LaporanActivity"
+            android:exported="false" />
+        <activity android:name=".admin.KasirActivity"
+            android:exported="false" />
+
 
         <!-- Activity Customer -->
         <activity
@@ -64,13 +79,6 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-            
-        <!-- Activity yang belum digunakan tapi sudah ada di file lama -->
-        <activity android:name=".admin.PengeluaranActivity" android:exported="false" />
-        <activity android:name=".admin.RiwayatPesananActivity" android:exported="false" />
-        <activity android:name=".admin.ManajemenUserActivity" android.exported="false" />
-        <activity android:name=".admin.LaporanActivity" android:exported="false" />
-        <activity android:name=".admin.KasirActivity" android:exported="false" />
 
     </application>
 

@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".admin.ManajemanMenuActivity">
+    tools:context=".admin.ManajemenMenuActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -30,10 +30,10 @@
             android:id="@+id/tab_layout_kategori"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabIndicatorColor="@color/white"
+            app:tabIndicatorColor="@color/Primary"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="#B3FFFFFF" />
+            app:tabSelectedTextColor="@color/Primary"
+            app:tabTextColor="@color/Primary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

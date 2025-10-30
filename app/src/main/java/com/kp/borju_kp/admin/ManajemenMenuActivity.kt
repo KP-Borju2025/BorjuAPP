@@ -147,7 +147,7 @@ class ManajemenMenuActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Gagal menghapus menu: ${e.message}", Toast.LENGTH_SHORT).show()
-                Log.e("ManajemanMenuActivity", "Error deleting document", e)
+                Log.e("ManajemenMenuActivity", "Error deleting document", e)
             }
     }
 }

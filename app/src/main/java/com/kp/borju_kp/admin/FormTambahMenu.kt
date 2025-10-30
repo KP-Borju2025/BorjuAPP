@@ -138,9 +138,11 @@ class FormTambahMenu : AppCompatActivity() {
 
         val newMenu = Menu(
             name = etNamaMenu.text.toString(),
+            detail = etDetailMenu.text.toString(),
             price = etHargaJual.text.toString().toDoubleOrNull() ?: 0.0,
             imageUrl = imageUrl,
             kategori = selectedCategoryName,
+            stok = etStokMenu.text.toString().toIntOrNull() ?: 0,
             status = isAvailable
         )
 

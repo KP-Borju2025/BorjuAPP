@@ -113,9 +113,10 @@ class FormEditMenu : AppCompatActivity() {
 
     private fun populateForm(menu: Menu) {
         etNamaMenu.setText(menu.name)
+        etDetailMenu.setText(menu.detail)
         etHargaJual.setText(menu.price.toString())
-        // TODO: Isi field lain seperti detail, harga beli, stok
-        
+        etHargaBeli.setText(menu.price.toString())
+        etStokMenu.setText(menu.stok.toString())
         actvKategori.setText(menu.kategori, false)
         switchStatus.isChecked = menu.status
         currentImageUrl = menu.imageUrl
@@ -169,9 +170,11 @@ class FormEditMenu : AppCompatActivity() {
     private fun updateMenuInFirestore(imageUrl: String) {
         val updatedData = hashMapOf(
             "name" to etNamaMenu.text.toString(),
+            "detail" to etDetailMenu.text.toString(),
             "price" to (etHargaJual.text.toString().toDoubleOrNull() ?: 0.0),
             "imageUrl" to imageUrl,
             "kategori" to actvKategori.text.toString(),
+            "stok" to (etStokMenu.text.toString().toIntOrNull() ?: 0),
             "status" to switchStatus.isChecked
             // TODO: Tambahkan field lain yang akan diupdate
         )
