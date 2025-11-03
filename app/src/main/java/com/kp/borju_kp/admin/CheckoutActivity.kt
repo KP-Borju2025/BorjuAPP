@@ -9,12 +9,12 @@ import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kp.borju_kp.R
 import com.kp.borju_kp.admin.adapter.CheckoutAdapter
@@ -36,9 +36,7 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_checkout)
-        enableEdgeToEdge()
 
-        // Inisialisasi Views
         rvCheckoutItems = findViewById(R.id.rv_checkout_items)
         tvFinalTotalPrice = findViewById(R.id.tv_final_total_price)
         btnProcessPayment = findViewById(R.id.btn_process_payment)
@@ -46,7 +44,6 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
         etCustomerName = findViewById(R.id.et_customer_name)
         actvPaymentMethod = findViewById(R.id.actv_payment_method)
 
-        // Setup UI
         setupToolbar()
         setupPaymentMethodDropdown()
         setupRecyclerView()
@@ -64,16 +61,6 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
         }
     }
 
-    private fun setupRecyclerView() {
-        checkoutAdapter = CheckoutAdapter(CartManager.getCartItems(), this)
-        rvCheckoutItems.layoutManager = LinearLayoutManager(this)
-        rvCheckoutItems.adapter = checkoutAdapter
-    }
-
-    private fun updateSummary() {
-        tvFinalTotalPrice.text = "Rp ${CartManager.getTotalPrice().toInt()}"
-    }
-
     private fun processOrder() {
         val customerName = etCustomerName.text.toString().trim()
         val paymentMethod = actvPaymentMethod.text.toString()
@@ -87,25 +74,34 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
             return
         }
 
-        val progressDialog = ProgressDialog(this)
-        progressDialog.setMessage("Menyimpan pesanan...")
-        progressDialog.setCancelable(false)
-        progressDialog.show()
+        val progressDialog = ProgressDialog(this).apply { setMessage("Menyimpan pesanan..."); setCancelable(false); show() }
 
         val orderItems = CartManager.getCartItems().map { OrderItem(it.menu.id, it.menu.name, it.menu.price, it.quantity, it.note) }
         
-        // Membuat objek Order dengan orderType "Offline"
+        // PERBAIKAN: Menggunakan named arguments untuk menghindari error urutan
         val order = Order(
             customerName = customerName,
             paymentMethod = paymentMethod,
             totalPrice = CartManager.getTotalPrice(),
-            status = "Baru", 
-            orderType = "Offline", // <-- PENYESUAIAN
+            status = "Selesai",
+            orderType = "Offline",
             orderTimestamp = null, // Akan diisi oleh server
             items = orderItems
         )
 
-        db.collection("orders").add(order).addOnSuccessListener {
+        // --- LOGIKA UPDATE STOK DENGAN WRITE BATCH ---
+        val batch = db.batch()
+
+        val newOrderRef = db.collection("orders").document()
+        batch.set(newOrderRef, order)
+
+        CartManager.getCartItems().forEach { cartItem ->
+            val menuRef = db.collection("menus").document(cartItem.menu.id)
+            val stockToDecrement = -cartItem.quantity.toLong()
+            batch.update(menuRef, "stok", FieldValue.increment(stockToDecrement))
+        }
+
+        batch.commit().addOnSuccessListener {
             progressDialog.dismiss()
             Toast.makeText(this, "Pesanan berhasil disimpan!", Toast.LENGTH_LONG).show()
             CartManager.clearCart()
@@ -116,9 +112,19 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
             finish()
         }.addOnFailureListener { e ->
             progressDialog.dismiss()
-            Log.e("CheckoutActivity", "Error saving order", e)
+            Log.e("CheckoutActivity", "Error committing batch", e)
             Toast.makeText(this, "Gagal menyimpan pesanan: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun setupRecyclerView() {
+        checkoutAdapter = CheckoutAdapter(CartManager.getCartItems(), this)
+        rvCheckoutItems.layoutManager = LinearLayoutManager(this)
+        rvCheckoutItems.adapter = checkoutAdapter
+    }
+
+    private fun updateSummary() {
+        tvFinalTotalPrice.text = "Rp ${CartManager.getTotalPrice().toInt()}"
     }
 
     private fun setupToolbar() {

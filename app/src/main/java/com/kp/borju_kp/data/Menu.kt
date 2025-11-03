@@ -6,6 +6,7 @@ data class Menu(
     @get:Exclude var id: String = "",
     val name: String = "",
     val price: Double = 0.0,
+    val priceBuy : Double = 0.0,
     val imageUrl: String = "",
     val kategori: String = "",
     val description: String = "",

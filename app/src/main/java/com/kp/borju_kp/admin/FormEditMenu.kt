@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -22,10 +21,10 @@ import com.google.firebase.firestore.SetOptions
 import com.kp.borju_kp.CloudinaryConfig
 import com.kp.borju_kp.R
 import com.kp.borju_kp.data.Menu
+import java.io.IOException // <-- PERBAIKAN: Import yang hilang ditambahkan di sini
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class FormEditMenu : AppCompatActivity() {
 
@@ -59,7 +58,6 @@ class FormEditMenu : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form_edit_menu)
-        enableEdgeToEdge()
 
         menuId = intent.getStringExtra("MENU_ID")
         if (menuId == null) {
@@ -116,20 +114,19 @@ class FormEditMenu : AppCompatActivity() {
     private fun populateForm(menu: Menu) {
         etNamaMenu.setText(menu.name)
         etHargaJual.setText(menu.price.toString())
-        // TODO: Isi field lain seperti detail, harga beli, stok
-        
+        etDetailMenu.setText(menu.description) 
+        etHargaBeli.setText(menu.priceBuy.toString()) 
+        etStokMenu.setText(menu.stok.toString())
         actvKategori.setText(menu.kategori, false)
         switchStatus.isChecked = menu.status
         currentImageUrl = menu.imageUrl
         
-        Glide.with(this).load(menu.imageUrl).into(imagePreview)
+        if(menu.imageUrl.isNotEmpty()){
+            Glide.with(this).load(menu.imageUrl).into(imagePreview)
+        }
     }
     
     private fun validateInput(): Boolean {
-        if (imageUri == null) {
-            Toast.makeText(this, "Silakan pilih gambar menu", Toast.LENGTH_SHORT).show()
-            return false
-        }
         if (etNamaMenu.text.isNullOrEmpty() || etHargaJual.text.isNullOrEmpty() || etStokMenu.text.isNullOrEmpty()) {
             Toast.makeText(this, "Nama, Harga Jual, dan Stok tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return false
@@ -148,20 +145,24 @@ class FormEditMenu : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val imageUrl = if (imageUri != null) {
-                    // Jika ada gambar baru, upload
-                    contentResolver.openInputStream(imageUri!!).use { 
-                        cloudinary.uploader().upload(it, null)["secure_url"] as String 
+                    contentResolver.openInputStream(imageUri!!)?.use { 
+                        cloudinary.uploader().upload(it, mapOf("folder" to "borju_app/menus"))["secure_url"] as String 
                     }
                 } else {
-                    // Jika tidak, gunakan URL gambar yang lama
-                    currentImageUrl!!
+                    currentImageUrl
                 }
-                withContext(Dispatchers.Main) { updateMenuInFirestore(imageUrl) }
+                withContext(Dispatchers.Main) { 
+                    if(imageUrl != null){
+                        updateMenuInFirestore(imageUrl)
+                    } else {
+                        throw IOException("Gagal mendapatkan URL gambar.")
+                    }
+                }
 
             } catch (e: Exception) {
                  Log.e("FormEditMenu", "Save failed", e)
                  withContext(Dispatchers.Main) {
-                    Toast.makeText(this@FormEditMenu, "Proses simpan gagal", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@FormEditMenu, "Proses simpan gagal: ${e.message}", Toast.LENGTH_SHORT).show()
                     resetButton()
                 }
             }
@@ -172,14 +173,16 @@ class FormEditMenu : AppCompatActivity() {
         val updatedData = hashMapOf(
             "name" to etNamaMenu.text.toString(),
             "price" to (etHargaJual.text.toString().toDoubleOrNull() ?: 0.0),
+            "priceBuy" to (etHargaBeli.text.toString().toDoubleOrNull() ?: 0.0),
+            "detail" to etDetailMenu.text.toString(),
             "imageUrl" to imageUrl,
+            "stok" to (etStokMenu.text.toString().toIntOrNull() ?: 0), 
             "kategori" to actvKategori.text.toString(),
             "status" to switchStatus.isChecked
-            // TODO: Tambahkan field lain yang akan diupdate
         )
 
         db.collection("menus").document(menuId!!)
-            .set(updatedData, SetOptions.merge()) // SetOptions.merge() penting!
+            .set(updatedData, SetOptions.merge()) 
             .addOnSuccessListener {
                 Toast.makeText(this, "Menu berhasil diperbarui!", Toast.LENGTH_SHORT).show()
                 finish()
@@ -194,12 +197,12 @@ class FormEditMenu : AppCompatActivity() {
         btnSimpan.isEnabled = true
         btnSimpan.text = "Simpan Menu"
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
             return true
         }
         return super.onOptionsItemSelected(item)
-        return true
     }
 }

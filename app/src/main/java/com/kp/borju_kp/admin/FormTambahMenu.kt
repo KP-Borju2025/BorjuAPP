@@ -141,9 +141,12 @@ class FormTambahMenu : AppCompatActivity() {
         val newMenu = Menu(
             name = etNamaMenu.text.toString(),
             price = etHargaJual.text.toString().toDoubleOrNull() ?: 0.0,
+            priceBuy = etHargaBeli.text.toString().toDoubleOrNull() ?: 0.0,
             imageUrl = imageUrl,
             kategori = selectedCategoryName,
-            status = isAvailable
+            status = isAvailable,
+            description = etDetailMenu.text.toString(),
+            stok = etStokMenu.text.toString().toIntOrNull() ?: 0
         )
 
         db.collection("menus").add(newMenu)
