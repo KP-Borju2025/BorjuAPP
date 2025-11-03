@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="130dp" 
+        android:paddingBottom="130dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="88dp" 
+        android:layout_marginBottom="88dp"
         app:tint="@color/white"
         app:backgroundTint="@color/Primary"
         android:src="@drawable/ic_cart" />

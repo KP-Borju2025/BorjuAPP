@@ -1,6 +1,5 @@
 package com.kp.borju_kp.customer.fragment
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,14 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.kp.borju_kp.R
 import com.kp.borju_kp.customer.CustomerCheckoutActivity
@@ -46,7 +43,6 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
         setupRecyclerView()
         observeViewModel()
 
-        // --- PERBAIKAN DI SINI ---
         btnCheckout.setOnClickListener {
             if (orderViewModel.cartItems.value.isNullOrEmpty()) {
                 Toast.makeText(context, "Keranjang kosong", Toast.LENGTH_SHORT).show()
@@ -60,18 +56,8 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
                 dismiss() // Menutup bottom sheet setelah membuka checkout
             }
         }
-        // --------------------------
 
         return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val bottomSheet = dialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-        if (bottomSheet != null) {
-            val behavior = BottomSheetBehavior.from(bottomSheet)
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
     }
 
     private fun setupRecyclerView() {

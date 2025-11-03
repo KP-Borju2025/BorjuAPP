@@ -15,6 +15,7 @@ data class Order(
     val totalPrice: Double = 0.0,
     val status: String = "Baru",
     val orderType: String = "Offline",
+    val paymentProofUrl: String = "",
     @ServerTimestamp
     val orderTimestamp: Date? = null,
     val items: List<OrderItem> = listOf()

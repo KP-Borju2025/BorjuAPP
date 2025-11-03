@@ -5,12 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
 import com.kp.borju_kp.R
 import com.kp.borju_kp.data.Order
@@ -42,10 +46,10 @@ class OrderDetailActivity : AppCompatActivity() {
     }
 
     private fun displayOrderDetails(order: Order) {
-        findViewById<TextView>(R.id.tv_detail_order_id).text = "ID: ${order.id}"
+        findViewById<TextView>(R.id.tv_detail_order_id).text = getString(R.string.order_id, order.id)
         findViewById<TextView>(R.id.tv_detail_payment_method).text = order.paymentMethod
         findViewById<TextView>(R.id.tv_detail_shipping_address).text = order.shippingAddress
-        findViewById<TextView>(R.id.tv_detail_total_price).text = "Total: Rp ${order.totalPrice.toInt()}"
+        findViewById<TextView>(R.id.tv_detail_total_price).text = getString(R.string.total_price, order.totalPrice.toInt())
 
         val sdf = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault())
         val dateString = order.orderTimestamp?.let { sdf.format(it) } ?: "N/A"
@@ -66,6 +70,27 @@ class OrderDetailActivity : AppCompatActivity() {
                 chipStatus.setChipBackgroundColorResource(R.color.orange_light)
                 chipStatus.setTextColor(ContextCompat.getColor(this, R.color.orange_dark))
             }
+        }
+
+        val btnViewPaymentProof: Button = findViewById(R.id.btn_view_payment_proof)
+        val ivPaymentProof: ImageView = findViewById(R.id.iv_payment_proof)
+
+        if (order.paymentProofUrl.isNotEmpty()) {
+            btnViewPaymentProof.visibility = View.VISIBLE
+            btnViewPaymentProof.setOnClickListener {
+                if (ivPaymentProof.isGone) {
+                    Glide.with(this)
+                        .load(order.paymentProofUrl)
+                        .into(ivPaymentProof)
+                    ivPaymentProof.isGone = false
+                    btnViewPaymentProof.text = getString(R.string.hide_payment_proof)
+                } else {
+                    ivPaymentProof.isGone = true
+                    btnViewPaymentProof.text = getString(R.string.view_payment_proof)
+                }
+            }
+        } else {
+            btnViewPaymentProof.visibility = View.GONE
         }
 
         val rvItems: RecyclerView = findViewById(R.id.rv_order_detail_items)
@@ -91,10 +116,10 @@ class OrderDetailItemAdapter(private val items: List<OrderItem>) : RecyclerView.
         fun bind(item: OrderItem) {
             val itemInfo: TextView = itemView.findViewById(R.id.tv_detail_item_info)
             val itemNote: TextView = itemView.findViewById(R.id.tv_detail_item_note)
-            itemInfo.text = "${item.quantity}x ${item.menuName}"
+            itemInfo.text = itemView.context.getString(R.string.item_info, item.quantity, item.menuName)
             if (item.note.isNotEmpty()) {
                 itemNote.visibility = View.VISIBLE
-                itemNote.text = "Catatan: ${item.note}"
+                itemNote.text = itemView.context.getString(R.string.item_note, item.note)
             } else {
                 itemNote.visibility = View.GONE
             }

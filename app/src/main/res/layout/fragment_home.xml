@@ -58,12 +58,66 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Menu Utama"
+                android:text="Menu Lainnya"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"/>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    app:singleSelection="true"
+                    app:chipSpacingHorizontal="8dp">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_all"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Semua"
+                        android:checked="true" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_food"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Makanan" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_drink"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Minuman" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_snack"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Snack" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_coffee"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kopi" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+            </HorizontalScrollView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_home"

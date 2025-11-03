@@ -23,4 +23,10 @@
         <item>Pengeluaran</item>
     </string-array>
 
+    <string name="order_id">ID: %s</string>
+    <string name="total_price">Total: Rp %d</string>
+    <string name="item_info">%dx %s</string>
+    <string name="item_note">Catatan: %s</string>
+    <string name="hide_payment_proof">Sembunyikan Bukti Pembayaran</string>
+    <string name="view_payment_proof">Lihat Bukti Pembayaran</string>
 </resources>

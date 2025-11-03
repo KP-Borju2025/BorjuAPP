@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -16,6 +17,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.chip.ChipGroup
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kp.borju_kp.R
 import com.kp.borju_kp.customer.adapter.FavoriteMenuAdapter
@@ -25,8 +27,9 @@ import com.kp.borju_kp.data.Menu
 import com.kp.borju_kp.viewmodel.OrderViewModel
 import java.util.Timer
 import java.util.TimerTask
+import kotlin.math.abs
 
-class HomeFragment : Fragment(), MenuAdapter.OnItemClickListener {
+class HomeFragment : Fragment(), MenuAdapter.OnMenuClickListener, FavoriteMenuAdapter.OnItemClickListener {
 
     private val orderViewModel: OrderViewModel by activityViewModels()
 
@@ -40,10 +43,10 @@ class HomeFragment : Fragment(), MenuAdapter.OnItemClickListener {
     private lateinit var rvFavoriteMenu: RecyclerView
     private lateinit var favoriteMenuAdapter: FavoriteMenuAdapter
     private val favoriteMenuList = ArrayList<Menu>()
-    private var favoriteScrollTimer: Timer? = null
 
     private lateinit var mainMenuAdapter: MenuAdapter
     private val mainMenuList = ArrayList<Menu>()
+    private val filteredMenuList = ArrayList<Menu>()
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -57,6 +60,7 @@ class HomeFragment : Fragment(), MenuAdapter.OnItemClickListener {
         setupImageSlider(view)
         setupFavoriteMenu(view)
         setupMainMenu(view)
+        setupFilter(view)
 
         fetchFavoriteMenus()
         fetchAllMenus()
@@ -69,57 +73,73 @@ class HomeFragment : Fragment(), MenuAdapter.OnItemClickListener {
         Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
     }
 
+    override fun onItemClick(menu: Menu) {
+        MenuDetailBottomSheetFragment.newInstance(menu).show(parentFragmentManager, MenuDetailBottomSheetFragment.TAG)
+    }
+
     private fun setupFavoriteMenu(view: View) {
         rvFavoriteMenu = view.findViewById(R.id.rv_favorite_menu)
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         rvFavoriteMenu.layoutManager = layoutManager
-        favoriteMenuAdapter = FavoriteMenuAdapter(favoriteMenuList)
+        favoriteMenuAdapter = FavoriteMenuAdapter(favoriteMenuList, this)
         rvFavoriteMenu.adapter = favoriteMenuAdapter
 
-        startFavoriteMenuAutoScroll()
-    }
+        // Menambahkan listener untuk mengatasi konflik scroll
+        rvFavoriteMenu.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            private var startX = 0f
+            private var startY = 0f
 
-    private fun startFavoriteMenuAutoScroll() {
-        favoriteScrollTimer?.cancel()
-        favoriteScrollTimer = Timer()
-
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = object : Runnable {
-            var currentPosition = 0
-            var forward = true
-
-            override fun run() {
-                if (favoriteMenuAdapter.itemCount > 0) {
-                    if (forward) {
-                        currentPosition++
-                        if (currentPosition >= favoriteMenuAdapter.itemCount) {
-                            currentPosition--
-                            forward = false
-                        }
-                    } else {
-                        currentPosition--
-                        if (currentPosition < 0) {
-                            currentPosition++
-                            forward = true
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                when (e.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        startX = e.x
+                        startY = e.y
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = abs(e.x - startX)
+                        val dy = abs(e.y - startY)
+                        if (dx > dy) {
+                            rv.parent.requestDisallowInterceptTouchEvent(true)
                         }
                     }
-                    rvFavoriteMenu.smoothScrollToPosition(currentPosition)
                 }
+                return false
             }
-        }
 
-        favoriteScrollTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                handler.post(runnable)
-            }
-        }, 5000, 5000)
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        })
     }
 
     private fun setupMainMenu(view: View) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.rv_home)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        mainMenuAdapter = MenuAdapter(mainMenuList, this)
+        mainMenuAdapter = MenuAdapter(filteredMenuList, this)
         recyclerView.adapter = mainMenuAdapter
+    }
+
+    private fun setupFilter(view: View) {
+        val chipGroup = view.findViewById<ChipGroup>(R.id.chip_group_filter)
+        chipGroup.setOnCheckedChangeListener { _, checkedId ->
+            val selectedCategory = when (checkedId) {
+                R.id.chip_food -> "Makanan"
+                R.id.chip_drink -> "Minuman"
+                R.id.chip_snack -> "Snack"
+                R.id.chip_coffee -> "Kopi"
+                else -> null
+            }
+            filterMenus(selectedCategory)
+        }
+    }
+
+    private fun filterMenus(category: String?) {
+        filteredMenuList.clear()
+        if (category == null) {
+            filteredMenuList.addAll(mainMenuList)
+        } else {
+            filteredMenuList.addAll(mainMenuList.filter { it.kategori == category })
+        }
+        mainMenuAdapter.notifyDataSetChanged()
     }
 
     private fun fetchFavoriteMenus() {
@@ -164,7 +184,7 @@ class HomeFragment : Fragment(), MenuAdapter.OnItemClickListener {
                     menu.id = document.id // PERBAIKAN: Menyimpan ID Dokumen
                     mainMenuList.add(menu)
                 }
-                mainMenuAdapter.notifyDataSetChanged()
+                filterMenus(null) // Tampilkan semua menu pada awalnya
             }.addOnFailureListener { e -> Log.w("HomeFragment", "Error getting all menus", e) }
     }
 
@@ -176,6 +196,9 @@ class HomeFragment : Fragment(), MenuAdapter.OnItemClickListener {
         imageList.add(R.drawable.ic_launcher_background)
         imageSliderAdapter = ImageSliderAdapter(imageList)
         imageSlider.adapter = imageSliderAdapter
+
+        imageSlider.setPageTransformer(ZoomOutPageTransformer())
+
         setupIndicators()
         setCurrentIndicator(0)
         imageSlider.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -227,6 +250,47 @@ class HomeFragment : Fragment(), MenuAdapter.OnItemClickListener {
     override fun onDestroyView() {
         super.onDestroyView()
         sliderHandler.removeCallbacks(sliderRunnable)
-        favoriteScrollTimer?.cancel()
+    }
+}
+
+private const val MIN_SCALE = 0.85f
+private const val MIN_ALPHA = 0.5f
+
+class ZoomOutPageTransformer : ViewPager2.PageTransformer {
+
+    override fun transformPage(view: View, position: Float) {
+        view.apply {
+            val pageWidth = width
+            val pageHeight = height
+            when {
+                position < -1 -> { // [-Infinity,-1)
+                    // This page is way off-screen to the left.
+                    alpha = 0f
+                }
+                position <= 1 -> { // [-1,1]
+                    // Modify the default slide transition to shrink the page as well
+                    val scaleFactor = MIN_SCALE.coerceAtLeast(1 - abs(position))
+                    val vertMargin = pageHeight * (1 - scaleFactor) / 2
+                    val horzMargin = pageWidth * (1 - scaleFactor) / 2
+                    translationX = if (position < 0) {
+                        horzMargin - vertMargin / 2
+                    } else {
+                        -horzMargin + vertMargin / 2
+                    }
+
+                    // Scale the page down (between MIN_SCALE and 1)
+                    scaleX = scaleFactor
+                    scaleY = scaleFactor
+
+                    // Fade the page relative to its size.
+                    alpha = (MIN_ALPHA +
+                            (((scaleFactor - MIN_SCALE) / (1 - MIN_SCALE)) * (1 - MIN_ALPHA)))
+                }
+                else -> { // (1,+Infinity]
+                    // This page is way off-screen to the right.
+                    alpha = 0f
+                }
+            }
+        }
     }
 }

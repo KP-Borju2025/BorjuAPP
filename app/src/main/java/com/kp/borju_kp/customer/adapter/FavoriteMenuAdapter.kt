@@ -10,7 +10,11 @@ import com.bumptech.glide.Glide
 import com.kp.borju_kp.R
 import com.kp.borju_kp.data.Menu
 
-class FavoriteMenuAdapter(private var menuList: List<Menu>) : RecyclerView.Adapter<FavoriteMenuAdapter.FavoriteViewHolder>() {
+class FavoriteMenuAdapter(private var menuList: List<Menu>, private val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<FavoriteMenuAdapter.FavoriteViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemClick(menu: Menu)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_favorite_menu, parent, false)
@@ -18,7 +22,11 @@ class FavoriteMenuAdapter(private var menuList: List<Menu>) : RecyclerView.Adapt
     }
 
     override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
-        holder.bind(menuList[position])
+        val menu = menuList[position]
+        holder.bind(menu)
+        holder.itemView.setOnClickListener {
+            itemClickListener.onItemClick(menu)
+        }
     }
 
     override fun getItemCount(): Int = menuList.size

@@ -135,6 +135,21 @@
                         android:gravity="center_vertical"
                         tools:text="COD (Bayar di Tempat)" />
 
+                    <Button
+                        android:id="@+id/btn_view_payment_proof"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Lihat Bukti Pembayaran"/>
+
+                    <ImageView
+                        android:id="@+id/iv_payment_proof"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        tools:src="@tools:sample/backgrounds/scenic" />
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

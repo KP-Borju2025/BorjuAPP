@@ -17,7 +17,7 @@ import com.kp.borju_kp.customer.adapter.MenuAdapter
 import com.kp.borju_kp.data.Menu
 import com.kp.borju_kp.viewmodel.OrderViewModel
 
-class CreateOrderFragment : Fragment(), MenuAdapter.OnItemClickListener {
+class CreateOrderFragment : Fragment(), MenuAdapter.OnMenuClickListener {
 
     private val orderViewModel: OrderViewModel by activityViewModels()
 
@@ -68,5 +68,9 @@ class CreateOrderFragment : Fragment(), MenuAdapter.OnItemClickListener {
     override fun onAddItemClick(menu: Menu) {
         orderViewModel.addItem(menu)
         Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onItemClick(menu: Menu) {
+        MenuDetailBottomSheetFragment.newInstance(menu).show(parentFragmentManager, MenuDetailBottomSheetFragment.TAG)
     }
 }

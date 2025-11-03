@@ -9,16 +9,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.kp.borju_kp.R
-import com.kp.borju_kp.customer.fragment.HomeFragment
 import com.kp.borju_kp.data.Menu
 
 class MenuAdapter(
     private val menuList: List<Menu>,
-    private val listener: OnItemClickListener
+    private val listener: OnMenuClickListener
 ) : RecyclerView.Adapter<MenuAdapter.MenuViewHolder>() {
 
-    interface OnItemClickListener {
+    interface OnMenuClickListener {
         fun onAddItemClick(menu: Menu)
+        fun onItemClick(menu: Menu)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
@@ -41,6 +41,10 @@ class MenuAdapter(
 
         holder.addToCartButton.setOnClickListener {
             listener.onAddItemClick(menu)
+        }
+
+        holder.itemView.setOnClickListener {
+            listener.onItemClick(menu)
         }
     }
 
