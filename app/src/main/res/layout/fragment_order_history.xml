@@ -8,36 +8,36 @@
     tools:context=".customer.fragment.OrderHistoryFragment">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:background="@color/Primary">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Riwayat Pesanan"
-            app:titleTextAppearance="@style/TextAppearance.App.Title.ExtraBold"
-            app:titleTextColor="@color/white" />
+            app:title="Riwayat Pesanan" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabGravity="fill"
-            app:tabIndicatorColor="@color/PrimaryDark"
-            app:tabSelectedTextColor="@color/PrimaryDark"
-            app:tabTextColor="@color/PrimaryDark"
-            app:tabMode="fixed" />
+            android:layout_height="wrap_content" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager_history"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

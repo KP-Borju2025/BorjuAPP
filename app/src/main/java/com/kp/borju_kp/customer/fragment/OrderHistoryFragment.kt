@@ -18,20 +18,19 @@ class OrderHistoryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate layout utama untuk fragment ini
         val view = inflater.inflate(R.layout.fragment_order_history, container, false)
 
-        val viewPager: ViewPager2 = view.findViewById(R.id.view_pager)
+        val viewPager: ViewPager2 = view.findViewById(R.id.view_pager_history)
         val tabLayout: TabLayout = view.findViewById(R.id.tab_layout)
 
-        // Gunakan 'this' sebagai FragmentManager untuk PagerAdapter
+        // Setup adapter
         val adapter = OrderHistoryPagerAdapter(this)
         viewPager.adapter = adapter
 
-        // Hubungkan TabLayout dengan ViewPager2
+        // Menghubungkan TabLayout dengan ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> "Dalam Proses"
+                0 -> "Berlangsung"
                 1 -> "Selesai"
                 else -> null
             }

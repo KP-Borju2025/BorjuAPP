@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_checkout_item_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_item_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/btn_remove_item"
+            app:layout_constraintStart_toEndOf="@+id/iv_checkout_item_image"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Nama Item" />
+
+        <TextView
+            android:id="@+id/tv_item_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/tv_item_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_item_name"
+            tools:text="@ Rp 10000" />
+
+        <LinearLayout
+            android:id="@+id/quantity_control"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/itemNoteLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/itemNoteLayout">
+
+            <Button
+                android:id="@+id/btn_decrease_quantity"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="-" />
+
+            <TextView
+                android:id="@+id/tv_item_quantity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="1" />
+
+            <Button
+                android:id="@+id/btn_increase_quantity"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="+" />
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/itemNoteLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/quantity_control"
+            app:layout_constraintStart_toStartOf="@id/tv_item_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_item_price">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_item_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Catatan" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/btn_remove_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

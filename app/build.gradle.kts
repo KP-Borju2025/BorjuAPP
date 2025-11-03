@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -68,4 +69,13 @@ dependencies {
 
     // iTextPDF untuk membuat file PDF
     implementation("com.itextpdf:itext7-core:7.2.5")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    // PERBAIKAN: Menambahkan dependency untuk Google Maps
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }

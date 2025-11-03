@@ -8,6 +8,7 @@ object SessionManager {
 
     private const val PREFS_NAME = "BorjuAppSession"
     private const val IS_LOGGED_IN = "isLoggedIn"
+    private const val USER_ID = "userId"
     private const val USER_ROLE = "userRole"
 
     private lateinit var prefs: SharedPreferences
@@ -19,6 +20,7 @@ object SessionManager {
     fun saveSession(user: User) {
         val editor = prefs.edit()
         editor.putBoolean(IS_LOGGED_IN, true)
+        editor.putString(USER_ID, user.id_user)
         editor.putString(USER_ROLE, user.nama_role)
         editor.apply()
     }
@@ -27,11 +29,15 @@ object SessionManager {
         return prefs.getBoolean(IS_LOGGED_IN, false)
     }
 
+    fun getUserId(): String? {
+        return prefs.getString(USER_ID, null)
+    }
+
     fun getUserRole(): String? {
         return prefs.getString(USER_ROLE, null)
     }
 
-    fun clearSession() {
+    fun logout() {
         val editor = prefs.edit()
         editor.clear()
         editor.apply()

@@ -1,105 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp">
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="10dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_checkout_item_quantity"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:layout_alignTop="@+id/tv_checkout_item_name"
+        android:textStyle="bold"
+        tools:text="1x" />
 
-        <ImageView
-            android:id="@+id/iv_checkout_item_image"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:scaleType="centerCrop"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+    <TextView
+        android:id="@+id/tv_checkout_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/tv_checkout_item_quantity"
+        android:layout_marginStart="16dp"
+        android:textStyle="bold"
+        android:layout_toStartOf="@+id/tv_checkout_item_total_price"
+        tools:text="Nama Makanan" />
 
-        <TextView
-            android:id="@+id/tv_item_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/iv_checkout_item_image"
-            app:layout_constraintTop_toTopOf="@id/iv_checkout_item_image"
-            app:layout_constraintEnd_toStartOf="@+id/btn_remove_item"
-            tools:text="Nama Menu Pesanan Super Panjang Sekali" />
+    <!-- TextView untuk menampilkan catatan -->
+    <TextView
+        android:id="@+id/tv_checkout_item_note"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_checkout_item_name"
+        android:layout_alignStart="@id/tv_checkout_item_name"
+        android:layout_toStartOf="@id/tv_checkout_item_total_price"
+        android:layout_marginTop="4dp"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        android:visibility="gone" 
+        tools:visibility="visible"
+        tools:text="Catatan: jangan pakai bawang, saus dipisah ya" />
 
-        <TextView
-            android:id="@+id/tv_item_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/tv_item_name"
-            app:layout_constraintTop_toBottomOf="@id/tv_item_name"
-            tools:text="Rp 25.000" />
+    <TextView
+        android:id="@+id/tv_checkout_item_total_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        tools:text="Rp 25.000" />
 
-        <ImageButton
-            android:id="@+id/btn_remove_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete" 
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <LinearLayout
-            android:id="@+id/quantity_control_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_remove_item">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_decrease_quantity"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="-"
-                app:iconPadding="0dp"/>
-
-            <TextView
-                android:id="@+id/tv_item_quantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="1" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_increase_quantity"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="+"
-                app:iconPadding="0dp" />
-
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/et_item_note"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Tulis catatan..."
-            android:inputType="textCapSentences"
-            android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@+id/quantity_control_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

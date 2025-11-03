@@ -5,32 +5,76 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="#F5F5F5" 
     tools:context=".customer.fragment.HomeFragment">
 
-<!--    <com.google.android.material.appbar.AppBarLayout-->
-<!--        android:id="@+id/appBarLayout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:fitsSystemWindows="true"-->
-<!--        android:background="@color/Primary">-->
-
-<!--        <com.google.android.material.appbar.MaterialToolbar-->
-<!--            android:id="@+id/toolbar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="?attr/actionBarSize"-->
-<!--            app:title="Selamat Datang Di KEDAI SAMBEL BORJU"-->
-<!--            app:titleTextAppearance="@style/TextAppearance.App.Title.ExtraBold"-->
-<!--            app:titleTextColor="@color/white" />-->
-
-<!--    </com.google.android.material.appbar.AppBarLayout>-->
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_home"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/image_slider"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:id="@+id/indicator_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Menu Favorit"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_favorite_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Menu Utama"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

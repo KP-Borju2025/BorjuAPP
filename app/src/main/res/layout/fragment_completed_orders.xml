@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rv_completed_orders"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    tools:context=".customer.fragment.CompletedOrdersFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_completed_orders"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="130dp" 
+        android:clipToPadding="false" />
+
+    <TextView
+        android:id="@+id/tv_no_completed_orders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tidak ada pesanan yang sudah selesai."
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+</FrameLayout>

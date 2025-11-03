@@ -7,15 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kp.borju_kp.R
-import com.kp.borju_kp.customer.MenuAdapter
+import com.kp.borju_kp.customer.adapter.MenuAdapter
 import com.kp.borju_kp.data.Menu
+import com.kp.borju_kp.viewmodel.OrderViewModel
 
-class CreateOrderFragment : Fragment() {
+class CreateOrderFragment : Fragment(), MenuAdapter.OnItemClickListener {
+
+    private val orderViewModel: OrderViewModel by activityViewModels()
 
     private lateinit var menuAdapter: MenuAdapter
     private val menuList = ArrayList<Menu>()
@@ -28,43 +32,41 @@ class CreateOrderFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_create_order, container, false)
 
-        // Setup RecyclerView dengan list kosong pada awalnya
         val recyclerView = view.findViewById<RecyclerView>(R.id.rv_menu_order)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        menuAdapter = MenuAdapter(menuList)
+        menuAdapter = MenuAdapter(menuList, this)
         recyclerView.adapter = menuAdapter
 
-        // Ambil data dari Firestore
         fetchMenuData()
 
         val fabCart = view.findViewById<FloatingActionButton>(R.id.fab_cart)
         fabCart.setOnClickListener {
-            Toast.makeText(context, "Buka Keranjang", Toast.LENGTH_SHORT).show()
+            CartBottomSheetFragment().show(parentFragmentManager, CartBottomSheetFragment.TAG)
         }
 
         return view
     }
 
     private fun fetchMenuData() {
-        // Ganti "menus" dengan nama collection Anda di Firestore
         db.collection("menus")
             .get()
             .addOnSuccessListener { result ->
-                // Hapus data lama sebelum menambahkan data baru
                 menuList.clear()
                 for (document in result) {
-                    // Secara otomatis Firestore akan mengubah dokumen menjadi data class Menu
-                    // Pastikan nama field di Firestore (misal: "name", "price", "imageUrl")
-                    // sama persis dengan nama properti di data class Menu Anda.
                     val menu = document.toObject(Menu::class.java)
+                    menu.id = document.id // PERBAIKAN: Menyimpan ID Dokumen
                     menuList.add(menu)
                 }
-                // Beri tahu adapter bahwa datanya sudah berubah dan RecyclerView harus di-update
                 menuAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener { exception ->
                 Log.w("CreateOrderFragment", "Error getting documents.", exception)
                 Toast.makeText(context, "Gagal memuat menu", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    override fun onAddItemClick(menu: Menu) {
+        orderViewModel.addItem(menu)
+        Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
     }
 }

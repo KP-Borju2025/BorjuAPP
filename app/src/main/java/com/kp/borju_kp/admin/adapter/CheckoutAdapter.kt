@@ -21,13 +21,13 @@ class CheckoutAdapter(
     private val listener: OnCartUpdateListener
 ) : RecyclerView.Adapter<CheckoutAdapter.CheckoutViewHolder>() {
 
-    // Interface untuk komunikasi ke Activity
     interface OnCartUpdateListener {
         fun onCartUpdated()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheckoutViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_checkout, parent, false)
+        // PERBAIKAN: Menggunakan layout item_checkout_admin
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_checkout_admin, parent, false)
         return CheckoutViewHolder(view)
     }
 
@@ -54,7 +54,6 @@ class CheckoutAdapter(
 
             Glide.with(itemView.context).load(cartItem.menu.imageUrl).centerCrop().into(itemImage)
 
-            // --- Note Handling ---
             itemNote.removeTextChangedListener(itemNote.tag as? TextWatcher)
             itemNote.setText(cartItem.note)
             val textWatcher = object : TextWatcher {
@@ -65,7 +64,6 @@ class CheckoutAdapter(
             itemNote.addTextChangedListener(textWatcher)
             itemNote.tag = textWatcher
 
-            // --- Button Listeners ---
             btnIncrease.setOnClickListener {
                 CartManager.increaseItemQuantity(cartItem)
                 listener.onCartUpdated() 

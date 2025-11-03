@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".customer.PaymentConfirmationActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Konfirmasi Pembayaran" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_payment_instruction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Silakan lakukan pembayaran sejumlah:"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_payment_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                tools:text="Rp 125.000" />
+
+            <!-- Tempat untuk QRIS atau No. Rekening -->
+            <FrameLayout
+                android:id="@+id/payment_method_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <ImageView
+                    android:id="@+id/iv_qris_code"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"
+                    tools:src="@tools:sample/backgrounds/scenic" 
+                    tools:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/tv_bank_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:visibility="gone"
+                    android:textIsSelectable="true"
+                    tools:text="Bank BCA\n123-456-7890\na.n. Kedai Kopi Borju" 
+                    tools:visibility="visible"/>
+            </FrameLayout>
+
+            <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Unggah Bukti Pembayaran" />
+
+            <ImageView
+                android:id="@+id/iv_proof_preview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerInside"
+                android:background="#E0E0E0"/>
+
+            <Button
+                android:id="@+id/btn_upload_proof"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:text="Pilih Gambar" />
+
+            <Button
+                android:id="@+id/btn_confirm_payment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Konfirmasi &amp; Buat Pesanan" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -4,23 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F5F5"
     android:fitsSystemWindows="true"
     tools:context=".customer.fragment.ProfileFragment">
 
+    <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:background="@color/Primary">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <com.google.android.material.appbar.MaterialToolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Profil"
-            app:titleTextAppearance="@style/TextAppearance.App.Title.ExtraBold"
-            app:titleTextColor="@color/white" />
+            app:title="Profil Saya" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -32,42 +32,117 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/iv_profile_picture"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginTop="32dp" />
-
-            <TextView
-                android:id="@+id/tv_profile_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Nama Pengguna"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_profile_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="email@example.com" />
-
-            <Space
+            <!-- Profile Info Section -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingVertical="32dp">
 
-            <Button
+                <!-- Foto Profile -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/iv_profile_picture"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_launcher_background"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                    app:strokeColor="@color/Primary"
+                    app:strokeWidth="2dp" />
+
+                <!-- Nama Customer -->
+                <TextView
+                    android:id="@+id/tv_profile_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    tools:text="Nama Pengguna" />
+
+                <!-- Email Customer -->
+                <TextView
+                    android:id="@+id/tv_profile_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="14sp"
+                    tools:text="email@example.com" />
+            </LinearLayout>
+
+            <!-- Menu Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:id="@+id/btn_edit_profile"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@android:drawable/ic_menu_edit"
+                        android:drawablePadding="20dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="12dp"
+                        android:text="Edit Profil"
+                        android:textAlignment="viewStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="#EEEEEE" />
+
+                    <TextView
+                        android:id="@+id/btn_order_history"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@android:drawable/ic_menu_recent_history"
+                        android:drawablePadding="20dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="12dp"
+                        android:text="Riwayat Pesanan"
+                        android:textAlignment="viewStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Logout Button -->
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:text="Logout" />
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:paddingVertical="12dp"
+                android:text="Logout"
+                app:cornerRadius="8dp"
+                app:icon="@android:drawable/ic_menu_revert"
+                app:iconGravity="textStart" />
 
         </LinearLayout>
 
