@@ -6,14 +6,12 @@ plugins {
 
 android {
     namespace = "com.kp.borju_kp"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.kp.borju_kp"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -30,11 +28,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         viewBinding = true
@@ -42,6 +40,10 @@ android {
 }
 
 dependencies {
+
+    // PERBAIKAN: Firebase BoM dikembalikan untuk mengelola versi library Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -56,16 +58,16 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(libs.material.v1120)
-    implementation(libs.material)
-    implementation("androidx.gridlayout:gridlayout:1.1.0")
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.cloudinary:cloudinary-android:3.1.2")
-    implementation("com.github.bumptech.glide:glide:5.0.5")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.cloudinary:cloudinary-android:2.4.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // iTextPDF untuk membuat file PDF
     implementation("com.itextpdf:itext7-core:7.2.5")
+
 }

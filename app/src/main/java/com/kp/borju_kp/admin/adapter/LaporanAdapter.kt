@@ -51,12 +51,12 @@ class LaporanAdapter(private var transaksiList: List<Transaksi>) : RecyclerView.
 
             if (transaksi.tipe == TipeTransaksi.PEMASUKAN) {
                 jumlah.text = "+ ${formattedAmount}"
-                // PERBAIKAN: Menggunakan atribut tema aplikasi
-                jumlah.setTextColor(getThemeColor(itemView.context, R.color.Tertiary))
+                // PERBAIKAN: Menggunakan atribut tema aplikasi yang benar
+                jumlah.setTextColor(getThemeColor(itemView.context, com.google.android.material.R.attr.colorTertiary))
             } else {
                 jumlah.text = "- ${formattedAmount}"
-                // PERBAIKAN: Menggunakan atribut tema aplikasi
-                jumlah.setTextColor(getThemeColor(itemView.context, R.color.Error))
+                // PERBAIKAN: Menggunakan atribut tema aplikasi yang benar
+                jumlah.setTextColor(getThemeColor(itemView.context, androidx.appcompat.R.attr.colorError))
             }
         }
 
