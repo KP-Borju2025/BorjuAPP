@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.kp.borju_kp.R
 import com.kp.borju_kp.customer.adapter.FavoriteMenuAdapter
 import com.kp.borju_kp.customer.adapter.ImageSliderAdapter
@@ -62,15 +63,22 @@ class HomeFragment : Fragment(), MenuAdapter.OnMenuClickListener, FavoriteMenuAd
         setupMainMenu(view)
         setupFilter(view)
 
-        fetchFavoriteMenus()
-        fetchAllMenus()
-
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        fetchFavoriteMenus()
+        fetchAllMenus()
+    }
+
     override fun onAddItemClick(menu: Menu) {
-        orderViewModel.addItem(menu)
-        Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
+        if (menu.status && menu.stok > 0) {
+            orderViewModel.addItem(menu)
+            Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Maaf, ${menu.name} tidak tersedia saat ini", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onItemClick(menu: Menu) {
@@ -84,28 +92,20 @@ class HomeFragment : Fragment(), MenuAdapter.OnMenuClickListener, FavoriteMenuAd
         favoriteMenuAdapter = FavoriteMenuAdapter(favoriteMenuList, this)
         rvFavoriteMenu.adapter = favoriteMenuAdapter
 
-        // Menambahkan listener untuk mengatasi konflik scroll
         rvFavoriteMenu.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
             private var startX = 0f
-            private var startY = 0f
-
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
                 when (e.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        startX = e.x
-                        startY = e.y
-                    }
+                    MotionEvent.ACTION_DOWN -> rv.parent.requestDisallowInterceptTouchEvent(true)
                     MotionEvent.ACTION_MOVE -> {
                         val dx = abs(e.x - startX)
-                        val dy = abs(e.y - startY)
-                        if (dx > dy) {
-                            rv.parent.requestDisallowInterceptTouchEvent(true)
-                        }
+                        if (dx > 5) rv.parent.requestDisallowInterceptTouchEvent(true)
                     }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> rv.parent.requestDisallowInterceptTouchEvent(false)
                 }
+                startX = e.x
                 return false
             }
-
             override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
             override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
         })
@@ -143,7 +143,7 @@ class HomeFragment : Fragment(), MenuAdapter.OnMenuClickListener, FavoriteMenuAd
     }
 
     private fun fetchFavoriteMenus() {
-        db.collection("orders").get()
+        db.collection("orders").get(Source.SERVER)
             .addOnSuccessListener { salesDocuments ->
                 val menuSalesCount = mutableMapOf<String, Int>()
                 for (document in salesDocuments) {
@@ -156,14 +156,14 @@ class HomeFragment : Fragment(), MenuAdapter.OnMenuClickListener, FavoriteMenuAd
                         }
                     }
                 }
-                val topMenuNames = menuSalesCount.entries.sortedByDescending { it.value }.map { it.key }
+                val topMenuNames = menuSalesCount.entries.sortedByDescending { it.value }.map { it.key }.take(5)
                 if (topMenuNames.isNotEmpty()) {
-                    db.collection("menus").whereIn("name", topMenuNames).get()
+                    db.collection("menus").whereIn("name", topMenuNames).get(Source.SERVER)
                         .addOnSuccessListener { menuDocuments ->
                             val tempMenus = mutableListOf<Menu>()
                             for (doc in menuDocuments) {
                                 val menu = doc.toObject(Menu::class.java)
-                                menu.id = doc.id // Menyimpan ID Dokumen
+                                menu.id = doc.id
                                 tempMenus.add(menu)
                             }
                             val sortedFavoriteMenus = topMenuNames.mapNotNull { name -> tempMenus.find { it.name == name } }
@@ -176,15 +176,21 @@ class HomeFragment : Fragment(), MenuAdapter.OnMenuClickListener, FavoriteMenuAd
     }
 
     private fun fetchAllMenus() {
-        db.collection("menus").get()
+        db.collection("menus").get(Source.SERVER)
             .addOnSuccessListener { documents ->
                 mainMenuList.clear()
                 for (document in documents) {
+                    // --- KODE DIAGNOSTIK DIMULAI ---
+                    val menuName = document.getString("name") ?: "[NAMA TIDAK DITEMUKAN]"
+                    val statusValue = document.get("status")
+                    Log.d("DIAGNOSTIC", "Menu: '$menuName' | Raw Status Value: '$statusValue' | Type: ${statusValue?.javaClass?.simpleName}")
+                    // --- KODE DIAGNOSTIK SELESAI ---
+
                     val menu = document.toObject(Menu::class.java)
-                    menu.id = document.id // PERBAIKAN: Menyimpan ID Dokumen
+                    menu.id = document.id
                     mainMenuList.add(menu)
                 }
-                filterMenus(null) // Tampilkan semua menu pada awalnya
+                filterMenus(null)
             }.addOnFailureListener { e -> Log.w("HomeFragment", "Error getting all menus", e) }
     }
 
@@ -209,12 +215,18 @@ class HomeFragment : Fragment(), MenuAdapter.OnMenuClickListener, FavoriteMenuAd
         })
         sliderHandler = Handler(Looper.getMainLooper())
         sliderRunnable = Runnable {
-            val currentItem = imageSlider.currentItem
-            val nextItem = if (currentItem == imageSliderAdapter.itemCount - 1) 0 else currentItem + 1
-            imageSlider.setCurrentItem(nextItem, true)
+             if(isAdded){
+                val currentItem = imageSlider.currentItem
+                val nextItem = if (currentItem == imageSliderAdapter.itemCount - 1) 0 else currentItem + 1
+                imageSlider.setCurrentItem(nextItem, true)
+            }
         }
         Timer().schedule(object : TimerTask() {
-            override fun run() { sliderHandler.post(sliderRunnable) }
+            override fun run() {
+                 if(isAdded) {
+                    sliderHandler.post(sliderRunnable)
+                 }
+            }
         }, 3000, 3000)
     }
 
@@ -263,12 +275,8 @@ class ZoomOutPageTransformer : ViewPager2.PageTransformer {
             val pageWidth = width
             val pageHeight = height
             when {
-                position < -1 -> { // [-Infinity,-1)
-                    // This page is way off-screen to the left.
-                    alpha = 0f
-                }
-                position <= 1 -> { // [-1,1]
-                    // Modify the default slide transition to shrink the page as well
+                position < -1 -> { alpha = 0f }
+                position <= 1 -> {
                     val scaleFactor = MIN_SCALE.coerceAtLeast(1 - abs(position))
                     val vertMargin = pageHeight * (1 - scaleFactor) / 2
                     val horzMargin = pageWidth * (1 - scaleFactor) / 2
@@ -277,19 +285,11 @@ class ZoomOutPageTransformer : ViewPager2.PageTransformer {
                     } else {
                         -horzMargin + vertMargin / 2
                     }
-
-                    // Scale the page down (between MIN_SCALE and 1)
                     scaleX = scaleFactor
                     scaleY = scaleFactor
-
-                    // Fade the page relative to its size.
-                    alpha = (MIN_ALPHA +
-                            (((scaleFactor - MIN_SCALE) / (1 - MIN_SCALE)) * (1 - MIN_ALPHA)))
+                    alpha = (MIN_ALPHA + (((scaleFactor - MIN_SCALE) / (1 - MIN_SCALE)) * (1 - MIN_ALPHA)))
                 }
-                else -> { // (1,+Infinity]
-                    // This page is way off-screen to the right.
-                    alpha = 0f
-                }
+                else -> { alpha = 0f }
             }
         }
     }

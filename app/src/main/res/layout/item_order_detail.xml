@@ -1,24 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:paddingVertical="4dp">
 
     <TextView
         android:id="@+id/tv_detail_item_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_detail_item_price"
+        tools:text="2x Ayam Geprek Super Panjang Sekali Namanya" />
+
+    <TextView
+        android:id="@+id/tv_detail_item_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="2x Ayam Geprek" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_detail_item_info"
+        tools:text="Rp 50.000" />
 
     <TextView
         android:id="@+id/tv_detail_item_note"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:textStyle="italic"
         android:visibility="gone"
-        tools:text="Catatan: Pedas sekali" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_detail_item_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Catatan: Pedas sekali jangan lupa ya" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

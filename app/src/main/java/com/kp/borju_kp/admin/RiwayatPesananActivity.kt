@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -61,7 +62,6 @@ class RiwayatPesananActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         riwayatAdapter = RiwayatPesananAdapter(
-            orderList = listOf(),
             onCardClick = { orderId ->
                 val intent = Intent(this, DetailPesananActivity::class.java)
                 intent.putExtra("ORDER_ID", orderId)
@@ -82,22 +82,51 @@ class RiwayatPesananActivity : AppCompatActivity() {
             .setItems(statuses) { dialog, which ->
                 val newStatus = statuses[which]
                 if (newStatus != order.status) {
-                    updateOrderStatusInFirestore(order.id, newStatus)
+                    // PERBAIKAN: Mengirim seluruh objek 'order' bukan hanya ID
+                    updateOrderStatus(order, newStatus)
                 }
                 dialog.dismiss()
             }
             .show()
     }
 
-    private fun updateOrderStatusInFirestore(orderId: String, newStatus: String) {
-        db.collection("orders").document(orderId)
-            .update("status", newStatus)
+    private fun updateOrderStatus(order: Order, newStatus: String) {
+        // Jika status baru adalah "Selesai", kurangi stok. Jika tidak, hanya ubah status.
+        if (newStatus == "Selesai") {
+            updateStockAndStatus(order, newStatus)
+        } else {
+            db.collection("orders").document(order.id)
+                .update("status", newStatus)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Status berhasil diubah ke $newStatus", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Gagal mengubah status: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    private fun updateStockAndStatus(order: Order, newStatus: String) {
+        val batch = db.batch()
+
+        // 1. Perbarui status pesanan
+        val orderRef = db.collection("orders").document(order.id)
+        batch.update(orderRef, "status", newStatus)
+
+        // 2. Kurangi stok untuk setiap item dalam pesanan
+        for (item in order.items) {
+            val menuRef = db.collection("menus").document(item.menuId)
+            val decrement = -item.quantity.toLong()
+            batch.update(menuRef, "stok", FieldValue.increment(decrement))
+        }
+
+        // 3. Jalankan semua operasi sekaligus
+        batch.commit()
             .addOnSuccessListener {
-                Toast.makeText(this, "Status berhasil diubah ke $newStatus", Toast.LENGTH_SHORT).show()
-                // Listener akan otomatis memperbarui UI
+                Toast.makeText(this, "Status diubah & stok diperbarui!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Gagal mengubah status: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Gagal memperbarui: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -116,15 +145,14 @@ class RiwayatPesananActivity : AppCompatActivity() {
             }
 
             if (snapshots != null && !snapshots.isEmpty) {
-                val orderList = snapshots.documents.map {
-                    val order = it.toObject(Order::class.java)
-                    order?.id = it.id
-                    order!!
+                val orderList = snapshots.documents.mapNotNull {
+                    it.toObject(Order::class.java)?.apply { id = it.id }
                 }
-                riwayatAdapter.updateData(orderList)
+                riwayatAdapter.submitList(orderList)
                 rvRiwayat.visibility = View.VISIBLE
             } else {
-                tvEmptyMessage.visibility = View.VISIBLE // <-- PERBAIKAN
+                tvEmptyMessage.visibility = View.VISIBLE
+                riwayatAdapter.submitList(emptyList())
             }
         }
     }

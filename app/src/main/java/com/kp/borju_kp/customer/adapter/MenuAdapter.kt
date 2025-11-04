@@ -53,12 +53,12 @@ class MenuAdapter(
                     .into(foodImage)
             }
 
-            if (menu.stok > 0) {
+            if (menu.status && menu.stok > 0) {
                 addToCartButton.text = "Tambah"
                 addToCartButton.isEnabled = true
                 addToCartButton.setOnClickListener { listener.onAddItemClick(menu) }
             } else {
-                addToCartButton.text = "Stok Habis"
+                addToCartButton.text = if (!menu.status) "Tidak Tersedia" else "Stok Habis"
                 addToCartButton.isEnabled = false
             }
 

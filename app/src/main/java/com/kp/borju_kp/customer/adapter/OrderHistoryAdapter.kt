@@ -1,12 +1,11 @@
 package com.kp.borju_kp.customer.adapter
 
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.kp.borju_kp.R
@@ -15,9 +14,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class OrderHistoryAdapter(
-    private val orderList: List<Order>,
-    private val onItemClick: (Order) -> Unit
-) : RecyclerView.Adapter<OrderHistoryAdapter.OrderViewHolder>() {
+    private val onOrderClick: (Order) -> Unit
+) : ListAdapter<Order, OrderHistoryAdapter.OrderViewHolder>(OrderDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_order_history, parent, false)
@@ -25,47 +23,51 @@ class OrderHistoryAdapter(
     }
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
-        val order = orderList[position]
-        holder.bind(order)
-        holder.itemView.setOnClickListener { onItemClick(order) }
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = orderList.size
-
-    class OrderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val tvOrderId: TextView = itemView.findViewById(R.id.tv_order_id)
-        private val tvOrderedItems: TextView = itemView.findViewById(R.id.tv_ordered_items)
-        private val tvOrderDate: TextView = itemView.findViewById(R.id.tv_order_date)
-        private val tvOrderTotal: TextView = itemView.findViewById(R.id.tv_order_total)
-        private val chipStatus: Chip = itemView.findViewById(R.id.chip_order_status)
+    inner class OrderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val orderId: TextView = itemView.findViewById(R.id.tv_order_id)
+        private val orderDate: TextView = itemView.findViewById(R.id.tv_order_date)
+        private val itemCount: TextView = itemView.findViewById(R.id.tv_item_count)
+        private val orderTotal: TextView = itemView.findViewById(R.id.tv_order_total)
+        private val orderStatus: Chip = itemView.findViewById(R.id.chip_order_status)
 
         fun bind(order: Order) {
-            val sdf = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault())
-            val dateString = order.orderTimestamp?.let { sdf.format(it) } ?: "Tanggal tidak tersedia"
+            // Menggunakan field kodePesanan yang baru
+            orderId.text = order.kodePesanan
+            orderDate.text = order.orderTimestamp?.let {
+                SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(it)
+            } ?: "N/A"
 
-            val itemsSummary = order.items.joinToString(separator = ", ") { it.menuName }
+            val totalItems = order.items.sumOf { it.quantity }
+            itemCount.text = "$totalItems items"
 
-            tvOrderId.text = "ID: ${order.id}"
-            tvOrderedItems.text = itemsSummary
-            tvOrderDate.text = dateString
-            tvOrderTotal.text = "Rp ${order.totalPrice.toInt()}"
-            chipStatus.text = order.status
+            orderTotal.text = "Rp ${order.totalPrice.toInt()}"
+            orderStatus.text = order.status
 
-            // Mengatur warna Chip berdasarkan status
-            when (order.status) {
-                "Selesai" -> {
-                    chipStatus.setChipBackgroundColorResource(R.color.green_light)
-                    chipStatus.setTextColor(ContextCompat.getColor(itemView.context, R.color.green_dark))
+            orderStatus.setChipBackgroundColorResource(
+                when (order.status) {
+                    "Selesai" -> R.color.Tertiary
+                    "Dibatalkan", "Ditolak" -> R.color.Error
+                    "Menunggu Konfirmasi" -> R.color.Secondary
+                    else -> R.color.Primary
                 }
-                "Dibatalkan" -> {
-                    chipStatus.setChipBackgroundColorResource(R.color.red_light)
-                    chipStatus.setTextColor(ContextCompat.getColor(itemView.context, R.color.red_dark))
-                }
-                else -> { // Menunggu Konfirmasi, Diproses, dll.
-                    chipStatus.setChipBackgroundColorResource(R.color.orange_light)
-                    chipStatus.setTextColor(ContextCompat.getColor(itemView.context, R.color.orange_dark))
-                }
+            )
+
+            itemView.setOnClickListener {
+                onOrderClick(getItem(bindingAdapterPosition))
             }
+        }
+    }
+
+    class OrderDiffCallback : DiffUtil.ItemCallback<Order>() {
+        override fun areItemsTheSame(oldItem: Order, newItem: Order): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Order, newItem: Order): Boolean {
+            return oldItem == newItem
         }
     }
 }

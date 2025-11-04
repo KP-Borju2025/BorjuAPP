@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.kp.borju_kp.R
 import com.kp.borju_kp.customer.OrderDetailActivity
@@ -24,7 +25,7 @@ class OngoingOrdersFragment : Fragment() {
     private lateinit var rvOngoingOrders: RecyclerView
     private lateinit var tvNoOrders: TextView
     private lateinit var orderAdapter: OrderHistoryAdapter
-    private val orderList = mutableListOf<Order>()
+    private var ordersListener: ListenerRegistration? = null
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -42,13 +43,18 @@ class OngoingOrdersFragment : Fragment() {
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadOngoingOrders()
+    override fun onStart() {
+        super.onStart()
+        listenToOngoingOrders()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        ordersListener?.remove()
     }
 
     private fun setupRecyclerView() {
-        orderAdapter = OrderHistoryAdapter(orderList) { selectedOrder ->
+        orderAdapter = OrderHistoryAdapter { selectedOrder ->
             val intent = Intent(activity, OrderDetailActivity::class.java).apply {
                 putExtra("order_detail", selectedOrder)
             }
@@ -60,7 +66,7 @@ class OngoingOrdersFragment : Fragment() {
         }
     }
 
-    private fun loadOngoingOrders() {
+    private fun listenToOngoingOrders() {
         val userId = SessionManager.getUserId()
         if (userId == null) {
             tvNoOrders.visibility = View.VISIBLE
@@ -70,30 +76,32 @@ class OngoingOrdersFragment : Fragment() {
 
         val ongoingStatuses = listOf("Menunggu Konfirmasi", "Diproses", "Menunggu Pembayaran")
 
-        db.collection("orders")
+        val query = db.collection("orders")
             .whereEqualTo("customerId", userId)
             .whereIn("status", ongoingStatuses)
             .orderBy("orderTimestamp", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { documents ->
-                if (documents.isEmpty) {
-                    tvNoOrders.visibility = View.VISIBLE
-                    rvOngoingOrders.visibility = View.GONE
-                } else {
-                    tvNoOrders.visibility = View.GONE
-                    rvOngoingOrders.visibility = View.VISIBLE
-                    orderList.clear()
-                    for (doc in documents) {
-                        val order = doc.toObject(Order::class.java)
-                        order.id = doc.id
-                        orderList.add(order)
-                    }
-                    orderAdapter.notifyDataSetChanged()
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("OngoingOrders", "Error getting documents: ", exception)
+
+        ordersListener = query.addSnapshotListener { snapshots, error ->
+            if (error != null) {
+                Log.e("OngoingOrders", "Listen failed.", error)
                 Toast.makeText(context, "Gagal memuat pesanan", Toast.LENGTH_SHORT).show()
+                return@addSnapshotListener
             }
+
+            if (snapshots != null && !snapshots.isEmpty) {
+                tvNoOrders.visibility = View.GONE
+                rvOngoingOrders.visibility = View.VISIBLE
+                val orders = snapshots.documents.map {
+                    val order = it.toObject(Order::class.java)
+                    order?.id = it.id
+                    order!!
+                }
+                orderAdapter.submitList(orders)
+            } else {
+                tvNoOrders.visibility = View.VISIBLE
+                rvOngoingOrders.visibility = View.GONE
+                orderAdapter.submitList(emptyList())
+            }
+        }
     }
 }

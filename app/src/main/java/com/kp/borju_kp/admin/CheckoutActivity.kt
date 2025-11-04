@@ -78,8 +78,13 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
 
         val orderItems = CartManager.getCartItems().map { OrderItem(it.menu.id, it.menu.name, it.menu.price, it.quantity, it.note) }
         
-        // PERBAIKAN: Menggunakan named arguments untuk menghindari error urutan
+        val newOrderRef = db.collection("orders").document()
+        val orderId = newOrderRef.id
+        val orderCode = "OFFL-${orderId.take(6).uppercase()}"
+
         val order = Order(
+            id = orderId,
+            kodePesanan = orderCode,
             customerName = customerName,
             paymentMethod = paymentMethod,
             totalPrice = CartManager.getTotalPrice(),
@@ -89,10 +94,7 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
             items = orderItems
         )
 
-        // --- LOGIKA UPDATE STOK DENGAN WRITE BATCH ---
         val batch = db.batch()
-
-        val newOrderRef = db.collection("orders").document()
         batch.set(newOrderRef, order)
 
         CartManager.getCartItems().forEach { cartItem ->

@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.kp.borju_kp.R
 import com.kp.borju_kp.customer.adapter.CheckoutAdapter
 import com.kp.borju_kp.data.CartItem
+import com.kp.borju_kp.data.Order
 import com.kp.borju_kp.utils.SessionManager
 import java.util.Locale
 
@@ -140,36 +141,46 @@ class CustomerCheckoutActivity : AppCompatActivity() {
             else -> "N/A"
         }
 
-        // Jika COD, langsung simpan pesanan
+        // Membuat referensi dokumen baru untuk mendapatkan ID unik
+        val newOrderRef = db.collection("orders").document()
+        val orderId = newOrderRef.id
+        val orderCode = "ONL-${orderId.take(6).uppercase()}"
+
+        val orderData = createOrderData(address, paymentMethod, orderId, orderCode)
+
         if (paymentMethod == "COD (Bayar di Tempat)") {
-            saveCodOrder(address)
+            saveCodOrder(newOrderRef, orderData)
         } else {
-            // Jika bukan COD, buka halaman konfirmasi pembayaran
-            navigateToPaymentConfirmation(address, paymentMethod)
+            navigateToPaymentConfirmation(orderData) // Mengirim HashMap, bukan Order
         }
     }
 
-    private fun saveCodOrder(address: String) {
-        val orderData = createOrderData(address, "COD (Bayar di Tempat)")
-        db.collection("orders").add(orderData)
+    private fun saveCodOrder(orderRef: com.google.firebase.firestore.DocumentReference, orderData: Map<String, Any>) {
+        orderRef.set(orderData)
             .addOnSuccessListener {
                 Toast.makeText(this, "Pesanan COD berhasil dibuat!", Toast.LENGTH_SHORT).show()
                 navigateToHome()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Gagal membuat pesanan COD", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Gagal membuat pesanan COD: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun navigateToPaymentConfirmation(address: String, paymentMethod: String) {
-        val orderData = createOrderData(address, paymentMethod)
+    private fun navigateToPaymentConfirmation(orderData: Map<String, Any>) {
+         val order = Order(
+            id = orderData["id"] as String,
+            kodePesanan = orderData["kodePesanan"] as String,
+            customerId = orderData["customerId"] as String,
+            // ... isi sisa field dari map ...
+        )
         val intent = Intent(this, PaymentConfirmationActivity::class.java).apply {
-            putExtra("order_data", orderData)
+            // Mengirim seluruh data sebagai HashMap untuk konsistensi
+            putExtra("order_data", HashMap(orderData))
         }
         startActivity(intent)
     }
 
-    private fun createOrderData(address: String, paymentMethod: String): HashMap<String, Any> {
+    private fun createOrderData(address: String, paymentMethod: String, orderId: String, orderCode: String): Map<String, Any> {
         val userId = SessionManager.getUserId() ?: ""
 
         val itemsForFirestore = cartItems?.map { cartItem ->
@@ -183,6 +194,8 @@ class CustomerCheckoutActivity : AppCompatActivity() {
         }
 
         return hashMapOf(
+            "id" to orderId,
+            "kodePesanan" to orderCode,
             "customerId" to userId,
             "customerName" to customerName,
             "shippingAddress" to address,

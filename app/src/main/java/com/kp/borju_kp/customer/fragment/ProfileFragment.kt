@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.kp.borju_kp.MainActivity
 import com.kp.borju_kp.R
 import com.kp.borju_kp.customer.DashboardCostumer
@@ -22,6 +23,7 @@ import com.kp.borju_kp.utils.SessionManager
 class ProfileFragment : Fragment() {
 
     private val db = FirebaseFirestore.getInstance()
+    private var userProfileListener: ListenerRegistration? = null
 
     private lateinit var profileImage: ShapeableImageView
     private lateinit var profileName: TextView
@@ -69,18 +71,29 @@ class ProfileFragment : Fragment() {
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadUserProfile()
+    override fun onStart() {
+        super.onStart()
+        listenToUserProfile()
     }
 
-    private fun loadUserProfile() {
+    override fun onStop() {
+        super.onStop()
+        userProfileListener?.remove()
+    }
+
+    private fun listenToUserProfile() {
         val userId = SessionManager.getUserId()
-        Log.d("ProfileFragment", "Loading profile for User ID: $userId")
+        Log.d("ProfileFragment", "Listening to profile for User ID: $userId")
 
         if (userId != null) {
-            db.collection("USER").document(userId).get()
-                .addOnSuccessListener { document ->
+            userProfileListener = db.collection("USER").document(userId)
+                .addSnapshotListener { document, error ->
+                    if (error != null) {
+                        Log.e("ProfileFragment", "Listen failed.", error)
+                        Toast.makeText(context, "Gagal memuat profil", Toast.LENGTH_SHORT).show()
+                        return@addSnapshotListener
+                    }
+
                     if (document != null && document.exists()) {
                         Log.d("ProfileFragment", "DocumentSnapshot data: ${document.data}")
 
@@ -107,10 +120,6 @@ class ProfileFragment : Fragment() {
                         profileName.text = "Pengguna Tidak Ditemukan"
                         profileEmail.text = ""
                     }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("ProfileFragment", "Error getting user document", exception)
-                    Toast.makeText(context, "Gagal memuat profil", Toast.LENGTH_SHORT).show()
                 }
         } else {
             Log.w("ProfileFragment", "User ID is null. User might not be logged in.")

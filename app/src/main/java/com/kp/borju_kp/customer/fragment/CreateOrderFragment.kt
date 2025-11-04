@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.kp.borju_kp.R
 import com.kp.borju_kp.customer.adapter.MenuAdapter
 import com.kp.borju_kp.data.Menu
@@ -37,8 +38,6 @@ class CreateOrderFragment : Fragment(), MenuAdapter.OnMenuClickListener {
         menuAdapter = MenuAdapter(menuList, this)
         recyclerView.adapter = menuAdapter
 
-        fetchMenuData()
-
         val fabCart = view.findViewById<FloatingActionButton>(R.id.fab_cart)
         fabCart.setOnClickListener {
             CartBottomSheetFragment().show(parentFragmentManager, CartBottomSheetFragment.TAG)
@@ -47,14 +46,18 @@ class CreateOrderFragment : Fragment(), MenuAdapter.OnMenuClickListener {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        fetchMenuData()
+    }
+
     private fun fetchMenuData() {
-        db.collection("menus")
-            .get()
+        db.collection("menus").get(Source.SERVER) // DIAGNOSTIK: Paksa ambil dari server
             .addOnSuccessListener { result ->
                 menuList.clear()
                 for (document in result) {
                     val menu = document.toObject(Menu::class.java)
-                    menu.id = document.id // PERBAIKAN: Menyimpan ID Dokumen
+                    menu.id = document.id
                     menuList.add(menu)
                 }
                 menuAdapter.notifyDataSetChanged()
@@ -66,8 +69,12 @@ class CreateOrderFragment : Fragment(), MenuAdapter.OnMenuClickListener {
     }
 
     override fun onAddItemClick(menu: Menu) {
-        orderViewModel.addItem(menu)
-        Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
+        if (menu.status && menu.stok > 0) {
+            orderViewModel.addItem(menu)
+            Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Maaf, ${menu.name} tidak tersedia saat ini", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onItemClick(menu: Menu) {

@@ -9,8 +9,10 @@ import java.util.Date
 @Parcelize
 data class Order(
     @get:Exclude var id: String = "",
+    var kodePesanan: String = "", // Field baru untuk ID yang ditampilkan
+    val customerId: String = "",
     val customerName: String = "",
-    val shippingAddress: String = "", // Properti untuk alamat pengiriman
+    val shippingAddress: String = "",
     val paymentMethod: String = "",
     val totalPrice: Double = 0.0,
     val status: String = "Baru",

@@ -10,7 +10,10 @@ import com.bumptech.glide.Glide
 import com.kp.borju_kp.R
 import com.kp.borju_kp.data.Menu
 
-class FavoriteMenuAdapter(private var menuList: List<Menu>, private val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<FavoriteMenuAdapter.FavoriteViewHolder>() {
+class FavoriteMenuAdapter(
+    private var menuList: List<Menu>,
+    private val itemClickListener: OnItemClickListener
+) : RecyclerView.Adapter<FavoriteMenuAdapter.FavoriteViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(menu: Menu)
@@ -49,7 +52,7 @@ class FavoriteMenuAdapter(private var menuList: List<Menu>, private val itemClic
                 Glide.with(itemView.context)
                     .load(menu.imageUrl)
                     .centerCrop()
-                    .placeholder(R.drawable.ic_launcher_background) // Placeholder image
+                    .placeholder(R.drawable.ic_launcher_background)
                     .into(image)
             }
         }

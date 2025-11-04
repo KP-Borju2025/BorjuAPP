@@ -168,6 +168,19 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Tombol Batalkan Pesanan -->
+            <Button
+                android:id="@+id/btn_cancel_order"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Batalkan Pesanan"
+                android:textColor="@color/Error"
+                app:strokeColor="@color/Error"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
