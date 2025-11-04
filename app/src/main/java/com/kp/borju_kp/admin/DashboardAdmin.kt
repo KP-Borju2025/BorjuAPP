@@ -5,13 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.kp.borju_kp.R
+import com.kp.borju_kp.admin.ProfileAdminActivity
 import java.text.NumberFormat
+import java.util.Calendar
 import java.util.Locale
 
 class DashboardAdmin : AppCompatActivity() {
@@ -27,7 +28,6 @@ class DashboardAdmin : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard_admin)
-        enableEdgeToEdge()
 
         tvJumlahPesanan = findViewById(R.id.tv_jumlah_pesanan_value)
         tvLabaBersih = findViewById(R.id.tv_laba_bersih_value)
@@ -38,7 +38,7 @@ class DashboardAdmin : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        listenToDashboardData()
+        listenToTodaysStats() // PERBAIKAN: Menggunakan fungsi yang baru
     }
 
     override fun onStop() {
@@ -47,48 +47,53 @@ class DashboardAdmin : AppCompatActivity() {
         expensesListener?.remove()
     }
 
-    private fun listenToDashboardData() {
-        var totalRevenue = 0.0
-        var totalExpenses = 0.0
+    private fun listenToTodaysStats() {
+        // 1. Tentukan rentang waktu untuk "Hari Ini"
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0); calendar.set(Calendar.MINUTE, 0); calendar.set(Calendar.SECOND, 0)
+        val startOfDay = calendar.time
 
+        calendar.set(Calendar.HOUR_OF_DAY, 23); calendar.set(Calendar.MINUTE, 59); calendar.set(Calendar.SECOND, 59)
+        val endOfDay = calendar.time
+        
+        var todaysRevenue = 0.0
+        var todaysExpenses = 0.0
+
+        // 2. Listener untuk Pesanan (Orders) HARI INI
         ordersListener = db.collection("orders")
             .whereEqualTo("status", "Selesai")
+            .whereGreaterThanOrEqualTo("orderTimestamp", startOfDay)
+            .whereLessThanOrEqualTo("orderTimestamp", endOfDay)
             .addSnapshotListener { snapshots, error ->
-                if (error != null) {
-                    Log.w("DashboardAdmin", "Listen error on orders", error)
-                    return@addSnapshotListener
-                }
-                totalRevenue = snapshots?.sumOf { it.getDouble("totalPrice") ?: 0.0 } ?: 0.0
-                val orderCount = snapshots?.size() ?: 0
-                tvJumlahPesanan.text = orderCount.toString()
-                updateNetProfit(totalRevenue, totalExpenses)
+                if (error != null) { Log.w("DashboardAdmin", "Listen error on today's orders", error); return@addSnapshotListener }
+                todaysRevenue = snapshots?.sumOf { it.getDouble("totalPrice") ?: 0.0 } ?: 0.0
+                tvJumlahPesanan.text = (snapshots?.size() ?: 0).toString()
+                updateNetProfit(todaysRevenue, todaysExpenses)
             }
 
+        // 3. Listener untuk Pengeluaran (Expenses) HARI INI
         expensesListener = db.collection("pengeluaran")
+            .whereGreaterThanOrEqualTo("tanggal", startOfDay)
+            .whereLessThanOrEqualTo("tanggal", endOfDay)
             .addSnapshotListener { snapshots, error ->
-                if (error != null) {
-                    Log.w("DashboardAdmin", "Listen error on expenses", error)
-                    return@addSnapshotListener
-                }
-                totalExpenses = snapshots?.sumOf { it.getDouble("jumlah") ?: 0.0 } ?: 0.0
-                tvTotalPengeluaran.text = formatCurrency(totalExpenses)
-                updateNetProfit(totalRevenue, totalExpenses)
+                if (error != null) { Log.w("DashboardAdmin", "Listen error on today's expenses", error); return@addSnapshotListener }
+                todaysExpenses = snapshots?.sumOf { it.getDouble("jumlah") ?: 0.0 } ?: 0.0
+                tvTotalPengeluaran.text = formatCurrency(todaysExpenses)
+                updateNetProfit(todaysRevenue, todaysExpenses)
             }
     }
 
     private fun updateNetProfit(revenue: Double, expenses: Double) {
-        val netProfit = revenue - expenses
-        tvLabaBersih.text = formatCurrency(netProfit)
+        tvLabaBersih.text = formatCurrency(revenue - expenses)
     }
 
     private fun formatCurrency(amount: Double): String {
         val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
         format.maximumFractionDigits = 0
-        return format.format(amount).replace("Rp", "Rp ")
+        return format.format(amount)
     }
 
     private fun setupNavigation() {
-        // PERBAIKAN: Menggunakan ImageButton, bukan MaterialCardView
         findViewById<ImageButton>(R.id.btn_profile).setOnClickListener {
             startActivity(Intent(this, ProfileAdminActivity::class.java))
         }
