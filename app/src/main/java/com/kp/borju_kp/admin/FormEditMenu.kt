@@ -1,5 +1,6 @@
 package com.kp.borju_kp.admin
 
+import android.app.ProgressDialog
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +9,6 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -22,14 +22,13 @@ import com.google.firebase.firestore.SetOptions
 import com.kp.borju_kp.CloudinaryConfig
 import com.kp.borju_kp.R
 import com.kp.borju_kp.data.Menu
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class FormEditMenu : AppCompatActivity() {
 
-    // UI Elements
     private lateinit var imagePreview: ShapeableImageView
     private lateinit var etNamaMenu: TextInputEditText
     private lateinit var etDetailMenu: TextInputEditText
@@ -40,11 +39,8 @@ class FormEditMenu : AppCompatActivity() {
     private lateinit var switchStatus: SwitchMaterial
     private lateinit var btnSimpan: Button
 
-    // Firebase & Cloudinary
     private val db = FirebaseFirestore.getInstance()
     private val cloudinary by lazy { CloudinaryConfig.instance }
-
-    // Data
     private var imageUri: Uri? = null
     private var currentImageUrl: String? = null
     private var menuId: String? = null
@@ -59,7 +55,6 @@ class FormEditMenu : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form_edit_menu)
-        enableEdgeToEdge()
 
         menuId = intent.getStringExtra("MENU_ID")
         if (menuId == null) {
@@ -76,6 +71,7 @@ class FormEditMenu : AppCompatActivity() {
         findViewById<Button>(R.id.btn_pilih_gambar).setOnClickListener { imagePickerLauncher.launch("image/*") }
         btnSimpan.setOnClickListener { if (validateInput()) { handleSave() } }
     }
+
     private fun initViews() {
         imagePreview = findViewById(R.id.iv_menu_image_preview)
         etNamaMenu = findViewById(R.id.et_nama_menu)
@@ -99,6 +95,7 @@ class FormEditMenu : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, categories)
         actvKategori.setAdapter(adapter)
     }
+
     private fun loadMenuData() {
         db.collection("menus").document(menuId!!).get()
             .addOnSuccessListener { doc ->
@@ -116,20 +113,19 @@ class FormEditMenu : AppCompatActivity() {
     private fun populateForm(menu: Menu) {
         etNamaMenu.setText(menu.name)
         etHargaJual.setText(menu.price.toString())
-        // TODO: Isi field lain seperti detail, harga beli, stok
-        
+        etDetailMenu.setText(menu.description) 
+        etHargaBeli.setText(menu.priceBuy.toString()) 
+        etStokMenu.setText(menu.stok.toString())
         actvKategori.setText(menu.kategori, false)
         switchStatus.isChecked = menu.status
         currentImageUrl = menu.imageUrl
         
-        Glide.with(this).load(menu.imageUrl).into(imagePreview)
+        if (menu.imageUrl.isNotEmpty()) {
+            Glide.with(this).load(menu.imageUrl).into(imagePreview)
+        }
     }
     
     private fun validateInput(): Boolean {
-        if (imageUri == null) {
-            Toast.makeText(this, "Silakan pilih gambar menu", Toast.LENGTH_SHORT).show()
-            return false
-        }
         if (etNamaMenu.text.isNullOrEmpty() || etHargaJual.text.isNullOrEmpty() || etStokMenu.text.isNullOrEmpty()) {
             Toast.makeText(this, "Nama, Harga Jual, dan Stok tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return false
@@ -142,64 +138,73 @@ class FormEditMenu : AppCompatActivity() {
     }
 
     private fun handleSave() {
-        btnSimpan.isEnabled = false
-        btnSimpan.text = "Menyimpan..."
+        // PERBAIKAN 1: Gunakan ProgressDialog
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Menyimpan perubahan...")
+            setCancelable(false)
+            show()
+        }
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val imageUrl = if (imageUri != null) {
-                    // Jika ada gambar baru, upload
-                    contentResolver.openInputStream(imageUri!!).use { 
-                        cloudinary.uploader().upload(it, null)["secure_url"] as String 
+                    progressDialog.setMessage("Mengunggah gambar baru...")
+                    contentResolver.openInputStream(imageUri!!)?.use { 
+                        cloudinary.uploader().upload(it, mapOf("folder" to "borju_app/menus"))["secure_url"] as String 
                     }
                 } else {
-                    // Jika tidak, gunakan URL gambar yang lama
-                    currentImageUrl!!
+                    currentImageUrl
                 }
-                withContext(Dispatchers.Main) { updateMenuInFirestore(imageUrl) }
+                withContext(Dispatchers.Main) { 
+                    if(imageUrl != null){
+                        progressDialog.setMessage("Menyimpan data...")
+                        updateMenuInFirestore(imageUrl, progressDialog)
+                    } else {
+                        throw IOException("Gagal mendapatkan URL gambar.")
+                    }
+                }
 
-            } catch (e: Exception) {
+            } catch (e: Exception) { // PERBAIKAN 2: Tangkap semua jenis Exception
                  Log.e("FormEditMenu", "Save failed", e)
                  withContext(Dispatchers.Main) {
-                    Toast.makeText(this@FormEditMenu, "Proses simpan gagal", Toast.LENGTH_SHORT).show()
-                    resetButton()
+                    progressDialog.dismiss()
+                    Toast.makeText(this@FormEditMenu, "Proses simpan gagal: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun updateMenuInFirestore(imageUrl: String) {
-        val updatedData = hashMapOf(
+    private fun updateMenuInFirestore(imageUrl: String, progressDialog: ProgressDialog) {
+        // PERBAIKAN 3: Logika membuat data dipisahkan agar bersih
+        val updatedData = mapOf(
             "name" to etNamaMenu.text.toString(),
             "price" to (etHargaJual.text.toString().toDoubleOrNull() ?: 0.0),
+            "priceBuy" to (etHargaBeli.text.toString().toDoubleOrNull() ?: 0.0),
+            "stok" to (etStokMenu.text.toString().toIntOrNull() ?: 0),
             "imageUrl" to imageUrl,
             "kategori" to actvKategori.text.toString(),
-            "status" to switchStatus.isChecked
-            // TODO: Tambahkan field lain yang akan diupdate
+            "status" to switchStatus.isChecked,
+            "description" to etDetailMenu.text.toString()
         )
 
         db.collection("menus").document(menuId!!)
-            .set(updatedData, SetOptions.merge()) // SetOptions.merge() penting!
+            .update(updatedData)
             .addOnSuccessListener {
+                progressDialog.dismiss()
                 Toast.makeText(this, "Menu berhasil diperbarui!", Toast.LENGTH_SHORT).show()
                 finish()
             }
             .addOnFailureListener { e ->
+                progressDialog.dismiss()
                 Toast.makeText(this, "Gagal memperbarui database", Toast.LENGTH_LONG).show()
-                resetButton()
             }
     }
 
-    private fun resetButton() {
-        btnSimpan.isEnabled = true
-        btnSimpan.text = "Simpan Menu"
-    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
             return true
         }
         return super.onOptionsItemSelected(item)
-        return true
     }
 }

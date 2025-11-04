@@ -6,13 +6,11 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kp.borju_kp.R
-import com.kp.borju_kp.admin.CartManager // <-- PERBAIKAN: Menambahkan import
 import com.kp.borju_kp.data.Menu
 
 class DetailMenuActivity : AppCompatActivity() {
@@ -30,9 +28,7 @@ class DetailMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_menu)
-        enableEdgeToEdge()
 
-        // Inisialisasi Views
         tvMenuName = findViewById(R.id.tv_detail_menu_name)
         tvMenuPrice = findViewById(R.id.tv_detail_menu_price)
         tvMenuDescription = findViewById(R.id.tv_detail_menu_description)
@@ -40,17 +36,14 @@ class DetailMenuActivity : AppCompatActivity() {
         btnAddToCart = findViewById(R.id.btn_add_to_cart_detail)
         toolbar = findViewById(R.id.toolbar_detail)
 
-        // Setup Toolbar
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        // Ambil ID menu dari Intent
         val menuId = intent.getStringExtra("MENU_ID")
-
         if (menuId == null) {
             Toast.makeText(this, "Error: Menu tidak ditemukan", Toast.LENGTH_LONG).show()
-            finish() // Tutup activity jika tidak ada ID
+            finish()
             return
         }
 
@@ -60,7 +53,7 @@ class DetailMenuActivity : AppCompatActivity() {
             currentMenu?.let {
                 CartManager.addItem(it)
                 Toast.makeText(this, "${it.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
-                finish() // Kembali ke KasirActivity setelah menambahkan
+                finish()
             }
         }
     }
@@ -71,18 +64,19 @@ class DetailMenuActivity : AppCompatActivity() {
                 if (document != null && document.exists()) {
                     val menu = document.toObject(Menu::class.java)
                     if (menu != null) {
-                        menu.id = document.id // Jangan lupa set ID
+                        menu.id = document.id
                         currentMenu = menu
                         displayMenuDetails(menu)
+                    } else {
+                        showErrorAndFinish("Gagal memproses data menu.")
                     }
                 } else {
-                    Toast.makeText(this, "Menu tidak ditemukan.", Toast.LENGTH_SHORT).show()
-                    finish()
+                    showErrorAndFinish("Menu tidak ditemukan di database.")
                 }
             }
             .addOnFailureListener { exception ->
                 Log.e("DetailMenuActivity", "Error fetching menu details", exception)
-                Toast.makeText(this, "Gagal memuat detail menu.", Toast.LENGTH_SHORT).show()
+                showErrorAndFinish("Gagal mengambil data dari server.")
             }
     }
 
@@ -91,12 +85,25 @@ class DetailMenuActivity : AppCompatActivity() {
         tvMenuName.text = menu.name
         tvMenuPrice.text = "Rp ${menu.price.toInt()}"
         tvMenuDescription.text = menu.description ?: "Tidak ada deskripsi."
+        
+        if (menu.imageUrl.isNotEmpty()){
+            Glide.with(this).load(menu.imageUrl).centerCrop().into(ivMenuImage)
+        }
 
-        // PERBAIKAN: Memuat gambar dari URL menggunakan Glide
-        Glide.with(this)
-            .load(menu.imageUrl)
-            .placeholder(R.drawable.ic_launcher_background) // Gambar sementara saat loading
-            .error(R.drawable.ic_launcher_background) // Gambar jika terjadi error
-            .into(ivMenuImage)
+        // PERBAIKAN UTAMA: Logika untuk menonaktifkan tombol jika stok habis
+        if (!menu.status || menu.stok <= 0) {
+            btnAddToCart.text = "Stok Habis"
+            btnAddToCart.isEnabled = false
+            btnAddToCart.isClickable = false
+        } else {
+            btnAddToCart.text = "Tambah ke Keranjang"
+            btnAddToCart.isEnabled = true
+            btnAddToCart.isClickable = true
+        }
+    }
+
+    private fun showErrorAndFinish(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        finish()
     }
 }
