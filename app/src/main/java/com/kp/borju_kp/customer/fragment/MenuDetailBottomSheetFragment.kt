@@ -56,10 +56,18 @@ class MenuDetailBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupAddToCartButton(menu: Menu) {
-        view?.findViewById<Button>(R.id.btn_add_to_cart_detail)?.setOnClickListener {
-            orderViewModel.addItem(menu)
-            Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
-            dismiss()
+        val btnAddToCart = view?.findViewById<Button>(R.id.btn_add_to_cart_detail)
+        if (menu.stok > 0) {
+            btnAddToCart?.text = "Tambah ke Keranjang"
+            btnAddToCart?.isEnabled = true
+            btnAddToCart?.setOnClickListener {
+                orderViewModel.addItem(menu)
+                Toast.makeText(context, "${menu.name} ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
+                dismiss()
+            }
+        } else {
+            btnAddToCart?.text = "Stok Habis"
+            btnAddToCart?.isEnabled = false
         }
     }
 

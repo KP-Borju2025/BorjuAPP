@@ -28,34 +28,43 @@ class MenuAdapter(
 
     override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
         val menu = menuList[position]
-        holder.foodName.text = menu.name
-        holder.foodPrice.text = "Rp ${menu.price.toInt()}"
-
-        if (menu.imageUrl.isNotEmpty()) {
-            Glide.with(holder.itemView.context)
-                .load(menu.imageUrl)
-                .centerCrop()
-                .placeholder(R.drawable.ic_launcher_background)
-                .into(holder.foodImage)
-        }
-
-        holder.addToCartButton.setOnClickListener {
-            listener.onAddItemClick(menu)
-        }
-
-        holder.itemView.setOnClickListener {
-            listener.onItemClick(menu)
-        }
+        holder.bind(menu)
     }
 
     override fun getItemCount(): Int {
         return menuList.size
     }
 
-    class MenuViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val foodImage: ImageView = itemView.findViewById(R.id.iv_food_image)
-        val foodName: TextView = itemView.findViewById(R.id.tv_food_name)
-        val foodPrice: TextView = itemView.findViewById(R.id.tv_food_price)
-        val addToCartButton: Button = itemView.findViewById(R.id.btn_add_to_cart)
+    inner class MenuViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val foodImage: ImageView = itemView.findViewById(R.id.iv_food_image)
+        private val foodName: TextView = itemView.findViewById(R.id.tv_food_name)
+        private val foodPrice: TextView = itemView.findViewById(R.id.tv_food_price)
+        private val addToCartButton: Button = itemView.findViewById(R.id.btn_add_to_cart)
+
+        fun bind(menu: Menu) {
+            foodName.text = menu.name
+            foodPrice.text = "Rp ${menu.price.toInt()}"
+
+            if (menu.imageUrl.isNotEmpty()) {
+                Glide.with(itemView.context)
+                    .load(menu.imageUrl)
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .into(foodImage)
+            }
+
+            if (menu.stok > 0) {
+                addToCartButton.text = "Tambah"
+                addToCartButton.isEnabled = true
+                addToCartButton.setOnClickListener { listener.onAddItemClick(menu) }
+            } else {
+                addToCartButton.text = "Stok Habis"
+                addToCartButton.isEnabled = false
+            }
+
+            itemView.setOnClickListener {
+                listener.onItemClick(menu)
+            }
+        }
     }
 }
