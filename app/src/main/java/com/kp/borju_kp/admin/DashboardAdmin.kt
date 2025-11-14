@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,6 +29,7 @@ class DashboardAdmin : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard_admin)
+        enableEdgeToEdge()
 
         tvJumlahPesanan = findViewById(R.id.tv_jumlah_pesanan_value)
         tvLabaBersih = findViewById(R.id.tv_laba_bersih_value)

@@ -37,9 +37,7 @@ class MenuDetailBottomSheetFragment : BottomSheetDialogFragment() {
             setupAddToCartButton(it)
         }
 
-        view.findViewById<ImageButton>(R.id.btn_close).setOnClickListener {
-            dismiss()
-        }
+
     }
 
     private fun displayMenuDetails(menu: Menu) {

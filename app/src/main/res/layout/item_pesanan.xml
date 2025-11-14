@@ -47,6 +47,16 @@
             tools:text="18 Mei 2024, 14:30" />
 
         <TextView
+            android:id="@+id/tv_order_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_order_timestamp"
+            tools:text="#BORJU-12345" />
+
+        <TextView
             android:id="@+id/tv_order_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

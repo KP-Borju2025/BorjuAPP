@@ -9,6 +9,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +37,7 @@ class CheckoutActivity : AppCompatActivity(), CheckoutAdapter.OnCartUpdateListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_checkout)
+        enableEdgeToEdge()
 
         rvCheckoutItems = findViewById(R.id.rv_checkout_items)
         tvFinalTotalPrice = findViewById(R.id.tv_final_total_price)

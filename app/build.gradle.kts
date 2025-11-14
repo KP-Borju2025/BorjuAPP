@@ -57,10 +57,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(libs.material.v1120)
-    implementation(libs.material)
     implementation("androidx.gridlayout:gridlayout:1.1.0")
-    implementation("com.google.firebase:firebase-firestore")
     implementation("com.cloudinary:cloudinary-android:3.1.2")
     implementation("com.github.bumptech.glide:glide:5.0.5")
 

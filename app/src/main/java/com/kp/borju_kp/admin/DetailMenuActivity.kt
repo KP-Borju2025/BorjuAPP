@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
@@ -28,6 +29,7 @@ class DetailMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_menu)
+        enableEdgeToEdge()
 
         tvMenuName = findViewById(R.id.tv_detail_menu_name)
         tvMenuPrice = findViewById(R.id.tv_detail_menu_price)

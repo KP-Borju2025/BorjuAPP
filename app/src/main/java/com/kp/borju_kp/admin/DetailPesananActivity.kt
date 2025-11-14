@@ -102,14 +102,14 @@ class DetailPesananActivity : AppCompatActivity() {
     }
 
     private fun displayOrderDetails(order: Order) {
-        customerName.text = "Nama: ${order.customerName}"
-        orderType.text = "Tipe: ${order.orderType}"
-        paymentMethod.text = "Bayar: ${order.paymentMethod}"
-        currentStatus.text = "Status Saat Ini: ${order.status}"
+        customerName.text = "${order.customerName}"
+        orderType.text = "${order.orderType}"
+        paymentMethod.text = "${order.paymentMethod}"
+        currentStatus.text = "${order.status}"
         totalPrice.text = "Total: Rp ${order.totalPrice.toInt()}"
         
         val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-        orderTimestamp.text = "Waktu: ${order.orderTimestamp?.let { sdf.format(it) } ?: "-"}"
+        orderTimestamp.text = "${order.orderTimestamp?.let { sdf.format(it) } ?: "-"}"
         
         // Set status saat ini di dropdown
         actvStatusSelector.setText(order.status, false)

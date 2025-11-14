@@ -6,17 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/Background"
+    android:gravity="center"
     tools:context=".auth.LoginActivity">
 
     <!-- Bagian Atas (logo & form) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp"
-        android:layout_marginTop="50dp"
         android:gravity="center_horizontal">
 
         <!-- Judul -->
@@ -47,7 +45,7 @@
             android:textAlignment="center"
             android:textSize="14sp"
             android:textColor="@color/Secondary"
-            android:layout_marginBottom="74dp" />
+            android:layout_marginBottom="100dp" />
 
         <!-- Form Login -->
         <com.google.android.material.textfield.TextInputLayout
@@ -104,34 +102,36 @@
             android:padding="14dp"
             android:textColor="@color/Surface"
             android:backgroundTint="@color/Primary"
-            android:elevation="2dp" />
+            android:elevation="2dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="100dp"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Belum punya akun? "
+                android:textColor="@color/TextSecondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_go_register"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Daftar Sekarang"
+                android:textColor="@color/Primary"
+                android:textSize="14sp" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Bagian Bawah (Daftar) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Belum punya akun? "
-            android:textColor="@color/TextSecondary"
-            android:textSize="14sp"/>
-
-        <TextView
-            android:id="@+id/tv_go_register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Daftar Sekarang"
-            android:textColor="@color/Primary"
-            android:fontFamily="@font/poppins_bold"
-            android:clickable="true"
-            android:focusable="true"
-            android:textSize="14sp"/>
-    </LinearLayout>
 
 </LinearLayout>

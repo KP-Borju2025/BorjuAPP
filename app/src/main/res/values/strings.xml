@@ -12,7 +12,8 @@
 
 
     <string-array name="order_statuses">
-        <item>Baru</item>
+        <item>Diterima</item>
+        <item>Diproses</item>
         <item>Selesai</item>
         <item>Dibatalkan</item>
     </string-array>

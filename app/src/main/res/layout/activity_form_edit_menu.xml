@@ -158,7 +158,7 @@
                 android:layout_marginTop="16dp"
                 android:text="Status Tersedia"
                 android:textSize="16sp"
-                android:checked="true" />
+                android:checked="true"/>
 
             <Button
                 android:id="@+id/btn_simpan_menu"
